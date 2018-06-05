@@ -78,6 +78,7 @@ public class RunCarsharing {
 
 		controler.run();
 
+
 	}
 
 	private static void setPatterns(String[] args){
