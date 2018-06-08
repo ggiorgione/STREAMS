@@ -8,5 +8,9 @@ public class DateUtils {
 
     public static final String DATE_TIME_MILLIS_PATTERN_2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
+    public static long doubleTime2CurrentLongTime(long statingSimulationTime, double currentDoubleTime){
+        return statingSimulationTime + ((long) (currentDoubleTime * 1000));
+    }
+
 
 }

@@ -77,6 +77,20 @@ public class RestConfiguration<R, D> {
 
     /**
      * Constructor generally used for get method. Pass a function to transform a result
+     * @param pathParam
+     * @param headerValue
+     * @param function
+     * @param entity
+     */
+    public RestConfiguration(List<String> pathParam, String headerValue, Function<Response, R> function, Entity<D> entity) {
+        this.pathParam = pathParam;
+        this.headerValue = headerValue;
+        this.function = function;
+        this.entity = entity;
+    }
+
+    /**
+     * Constructor generally used for get method. Pass a function to transform a result
      * @param route
      * @param pathParam
      * @param headerValue

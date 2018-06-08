@@ -127,6 +127,7 @@ public class RunCarsharing {
 		final RestService restService = new ExaRestService();
 
 
+
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override
@@ -146,6 +147,7 @@ public class RunCarsharing {
 				bind(PropertyManager.class).to(PropertyManagerImpl.class);
 				bind(RestClientImpl.class).asEagerSingleton();
 				bind(KeycloakTokenManager.class).asEagerSingleton();
+				bind(SimulationTime.class).asEagerSingleton();
 
 				bind(HttpInvoker.class).toInstance(httpInvoker);
 				bind(RestService.class).toInstance(restService);

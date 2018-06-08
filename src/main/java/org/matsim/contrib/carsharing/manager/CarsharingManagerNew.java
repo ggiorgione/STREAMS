@@ -148,7 +148,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 
 					return null;
 				}
-			
+
 				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, 
 						chosenVehicle.getCompanyId(), startLink, stationLink, destinationLink, person.getId(), chosenVehicle.getVehicleId()));
 			

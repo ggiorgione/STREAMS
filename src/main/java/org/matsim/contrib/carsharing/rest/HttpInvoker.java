@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.carsharing.rest.oauth.OauthUtils;
 
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedMap;

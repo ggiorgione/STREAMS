@@ -1,8 +1,7 @@
 package org.matsim.contrib.carsharing.manager.demand;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -13,7 +12,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.carsharing.entity.Trip;
+import org.matsim.contrib.carsharing.entity.TripTypes;
 import org.matsim.contrib.carsharing.events.EndRentalEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.events.handlers.EndRentalEventHandler;
@@ -22,16 +21,26 @@ import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.rest.RestService;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-/** 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.matsim.contrib.carsharing.entity.DateUtils.doubleTime2CurrentLongTime;
+
+/**
  * @author balac
  */
 public class DemandHandler implements PersonLeavesVehicleEventHandler, 
 PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler, EndRentalEventHandler {
+
+
+	private static final Logger log = Logger.getLogger(DemandHandler.class);
 	
 	@Inject Scenario scenario;
 	@Inject CarsharingSupplyInterface carsharingSupplyContainer;
 	@Inject RestService restService;
+	@Inject SimulationTime simulationTime;
 
 	private Map<Id<Person>, AgentRentals> agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();	
 
@@ -51,6 +60,11 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		vehiclePersonMap = new HashMap<Id<Vehicle>, Id<Person>>();
 
 		enterVehicleTimes = new HashMap<Id<Person>, Double>();
+
+		//Reset simulation time for next iteration and delete all bookings
+
+
+		simulationTime.resetSimulationTime();
 	}
 
 	@Override
@@ -62,7 +76,6 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		agentRentals.getStatsPerVehicle().remove(event.getvehicleId());
 		info.setEndTime(event.getTime());
 		info.setEndLinkId(event.getLinkId());
-
 		agentRentals.getArr().add(info);
 
 		Id<Vehicle> vehicleId = Id.create(event.getvehicleId(), Vehicle.class);
@@ -82,6 +95,11 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		info.setStartTime(event.getTime());
 		info.setOriginLinkId(event.getOriginLinkId());
 		info.setPickupLinkId(event.getPickuplinkId());
+		info.setVehId(Id.createVehicleId(event.getvehicleId()));
+		info.setTripTypes(TripTypes.UNPLANNED);
+		info.setPersonId(event.getPersonId());
+		info.setRealStart(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), event.getTime()));
+
 
 		if (agentRentalsMap.containsKey(event.getPersonId())) {
 			AgentRentals agentRentals = this.agentRentalsMap.get(event.getPersonId());
@@ -92,7 +110,13 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 			AgentRentals agentRentals = new AgentRentals(event.getPersonId());
 			agentRentalsMap.put(event.getPersonId(), agentRentals);			
 			agentRentals.getStatsPerVehicle().put(event.getvehicleId(), info);			
-		}		
+		}
+
+		/* TODO save trip infos. We need to cancel trip every iteration */
+		restService.rentCar(info);
+
+
+
 	}
 
 	@Override
@@ -126,6 +150,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 				if (info.getAccessEndTime() == 0.0)
 					info.setAccessEndTime(event.getTime());
+
 			}
 		}
 		
@@ -144,6 +169,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 				AgentRentals agentRentals = this.agentRentalsMap.get(personId);
 				RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getVehicleId().toString());
 				info.setInVehicleTime(info.getInVehicleTime() + totalTime);
+
 			}
 		}
 	}

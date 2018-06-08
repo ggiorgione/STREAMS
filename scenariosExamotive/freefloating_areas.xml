@@ -2,7 +2,7 @@
 <!DOCTYPE areas SYSTEM "src/main/resources/dtd/freefloating_areas_v1.dtd">
 
 <areas>
-    <company name="Mobility">
+    <company name="Oply">
         <area id="100">
             <node x="-350.0" y="500.0"/>
             <node x="1500.0" y="500.0"/>

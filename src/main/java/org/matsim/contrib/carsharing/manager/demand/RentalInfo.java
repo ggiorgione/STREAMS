@@ -2,6 +2,8 @@ package org.matsim.contrib.carsharing.manager.demand;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.entity.TripTypes;
 import org.matsim.vehicles.Vehicle;
 /** 
  * @author balac
@@ -105,6 +107,38 @@ public class RentalInfo {
 	private double egressStartTime = 0.0;
 	private double egressEndTime = 0.0;
 	private Id<Vehicle> vehId = null;
+
+	private TripTypes tripTypes;
+
+	private Id<Person> personId;
+
+	private long realStart;
+
+	public TripTypes getTripTypes() {
+		return tripTypes;
+	}
+
+	public void setTripTypes(TripTypes tripTypes) {
+		this.tripTypes = tripTypes;
+	}
+
+
+	public Id<Person> getPersonId() {
+		return personId;
+	}
+
+	public void setPersonId(Id<Person> personId) {
+		this.personId = personId;
+	}
+
+	public long getRealStart() {
+		return realStart;
+	}
+
+	public void setRealStart(long realStart) {
+		this.realStart = realStart;
+	}
+
 	public String toString() {
 		
 		return carsharingType + "," + Double.toString(startTime) + "," + Double.toString(endTime) + "," +
