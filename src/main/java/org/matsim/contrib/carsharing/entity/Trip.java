@@ -1,13 +1,16 @@
 package org.matsim.contrib.carsharing.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.Date;
 
 import static org.matsim.contrib.carsharing.entity.DateUtils.DATE_TIME_PATTERN;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Trip extends BaseEntity {
 

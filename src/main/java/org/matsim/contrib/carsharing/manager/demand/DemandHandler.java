@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.entity.Trip;
 import org.matsim.contrib.carsharing.entity.TripTypes;
 import org.matsim.contrib.carsharing.events.EndRentalEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
@@ -21,10 +22,9 @@ import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.rest.RestService;
 import org.matsim.vehicles.Vehicle;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.math.BigInteger;
+import java.time.Instant;
+import java.util.*;
 
 import static org.matsim.contrib.carsharing.entity.DateUtils.doubleTime2CurrentLongTime;
 
@@ -48,8 +48,12 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 	private Map<Id<Vehicle>, Id<Person>> vehiclePersonMap = new HashMap<Id<Vehicle>, Id<Person>>();
 
-	private Map<Id<Person>, Double> enterVehicleTimes = new HashMap<Id<Person>, Double>();	
+	private Map<Id<Person>, Double> enterVehicleTimes = new HashMap<Id<Person>, Double>();
 
+	private Map<Id<Person>, BigInteger> personTripIdMap = new HashMap<>();
+
+	/** IDs of all trips that were created during the current iteration. */
+	private Set<BigInteger> tripIds = new HashSet<>();
 
 	@Override
 	public void reset(int iteration) {
@@ -65,17 +69,27 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 
 		simulationTime.resetSimulationTime();
+
+		personTripIdMap = new HashMap<>();
+
+		tripIds.stream().forEach(restService::cancelTrip);
+
+		tripIds = new HashSet<>();
 	}
 
 	@Override
 	public void handleEvent(EndRentalEvent event) {
-		
+
 		AgentRentals agentRentals = this.agentRentalsMap.get(event.getPersonId());
 		
 		RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getvehicleId());
 		agentRentals.getStatsPerVehicle().remove(event.getvehicleId());
 		info.setEndTime(event.getTime());
 		info.setEndLinkId(event.getLinkId());
+		Instant realEnd = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), event.getTime()));
+		info.setRealEnd(realEnd);
+		BigInteger tripId = personTripIdMap.remove(event.getPersonId());
+		info.setTripId(tripId);
 		agentRentals.getArr().add(info);
 
 		Id<Vehicle> vehicleId = Id.create(event.getvehicleId(), Vehicle.class);
@@ -84,6 +98,9 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		}
 
 		this.vehicleRentalsMap.get(vehicleId).getRentals().add(info);
+
+		restService.endTrip(info);
+
 }
 
 	@Override
@@ -98,7 +115,6 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		info.setVehId(Id.createVehicleId(event.getvehicleId()));
 		info.setTripTypes(TripTypes.UNPLANNED);
 		info.setPersonId(event.getPersonId());
-		info.setRealStart(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), event.getTime()));
 
 
 		if (agentRentalsMap.containsKey(event.getPersonId())) {
@@ -112,10 +128,13 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 			agentRentals.getStatsPerVehicle().put(event.getvehicleId(), info);			
 		}
 
-		/* TODO save trip infos. We need to cancel trip every iteration */
-		restService.rentCar(info);
-
-
+		Trip trip = restService.rentCar(info);
+		tripIds.add(trip.getId());
+		personTripIdMap.put(event.getPersonId(), trip.getId());
+		// TODO start the trip when the customer enters the car
+		Instant realStart = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), event.getTime()));
+		trip.setRealStart(Date.from(realStart));
+		restService.startTrip(trip);
 
 	}
 

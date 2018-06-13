@@ -19,11 +19,22 @@ public class Transformation {
 		trip.setCar(new BigInteger(rentalInfo.getVehId().toString()));
 		trip.setIsBlocked(false);
 		trip.setTripType(rentalInfo.getTripTypes());
-		trip.setRealStart(new Date(rentalInfo.getRealStart()));
 
 		return trip;
 	}
 
-
+	public static OTAPush rentalInfo2OTAPush(RentalInfo rentalInfo) {
+		OTAPush push = new OTAPush();
+		OTAKey key = new OTAKey();
+		key.setExtId(rentalInfo.getTripId().toString());
+		key.setRealEndDate(rentalInfo.getRealEnd());
+		push.setKey(key);
+		OTAVehicleSynthesis vehicleSynthesis = new OTAVehicleSynthesis();
+		push.setVehicleSynthesis(vehicleSynthesis);
+		// TODO set vehicleSynthesis.{mileage, energyLevel}
+		// TODO set vehicleSynthesis.gpsInformation -- unfortunately, MatSim uses two-dimensional
+		//      cartesian coordinates which cannot be transformed to longitude / latitude easily
+		return push;
+	}
 
 }

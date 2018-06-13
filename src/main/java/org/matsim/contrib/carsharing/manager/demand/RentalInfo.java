@@ -1,11 +1,16 @@
 package org.matsim.contrib.carsharing.manager.demand;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.entity.TripTypes;
 import org.matsim.vehicles.Vehicle;
-/** 
+
+import java.math.BigInteger;
+import java.time.Instant;
+
+/**
  * @author balac
  */
 public class RentalInfo {
@@ -112,7 +117,9 @@ public class RentalInfo {
 
 	private Id<Person> personId;
 
-	private long realStart;
+	private Instant realEnd;
+
+	private BigInteger tripId;
 
 	public TripTypes getTripTypes() {
 		return tripTypes;
@@ -131,12 +138,20 @@ public class RentalInfo {
 		this.personId = personId;
 	}
 
-	public long getRealStart() {
-		return realStart;
+	public Instant getRealEnd() {
+		return realEnd;
 	}
 
-	public void setRealStart(long realStart) {
-		this.realStart = realStart;
+	public BigInteger getTripId() {
+		return tripId;
+	}
+
+	public void setTripId(BigInteger tripId) {
+		this.tripId = tripId;
+	}
+
+	public void setRealEnd(Instant realEnd) {
+		this.realEnd = realEnd;
 	}
 
 	public String toString() {

@@ -4,10 +4,14 @@ package org.matsim.contrib.carsharing.entity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
+import static org.matsim.contrib.carsharing.entity.DateUtils.instant2String;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OTAKey {
-
 
 	private BigInteger id;
 
@@ -86,6 +90,10 @@ public class OTAKey {
 
 	public void setRealEndDate(String realEndDate) {
 		this.realEndDate = realEndDate;
+	}
+
+	public void setRealEndDate(Instant realEndDate) {
+		this.realEndDate = instant2String(realEndDate);
 	}
 
 	public String getVehicleExtId() {
