@@ -17,4 +17,6 @@ public interface RestService {
     Trip cancelTrip(BigInteger id);
 
     Trip endTrip(RentalInfo RentalInfo);
+
+    void setTime(long l);
 }

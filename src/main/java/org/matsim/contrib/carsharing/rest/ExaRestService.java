@@ -2,24 +2,20 @@ package org.matsim.contrib.carsharing.rest;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.carsharing.entity.*;
+import org.matsim.contrib.carsharing.entity.OTAPush;
+import org.matsim.contrib.carsharing.entity.Trip;
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-
 import static org.matsim.contrib.carsharing.entity.DateUtils.instant2String;
-import static org.matsim.contrib.carsharing.entity.Transformation.getExaTrip;
-import static org.matsim.contrib.carsharing.entity.Transformation.rentalInfo2OTAPush;
-import static org.matsim.contrib.carsharing.entity.Transformation.rentalInfo2Trip;
+import static org.matsim.contrib.carsharing.entity.Transformation.*;
 
 public class ExaRestService implements RestService{
 
@@ -27,6 +23,7 @@ public class ExaRestService implements RestService{
     private static final String TRIP_URI = "exa-booking/rest/trips";
     private static final String PUSH_URI = "exa-connection/rest/push";
     private static final String PUSH_SIM_URI = "exa-connection/rest/sim/push";
+    private static final String TIME_URI = "exa-booking/rest/sim/time";
     private static final Logger log = Logger.getLogger(ExaRestService.class);
 
     @Inject
@@ -93,6 +90,15 @@ public class ExaRestService implements RestService{
         Entity<OTAPush> entity = Entity.entity(push, MediaType.APPLICATION_JSON);
         RestConfiguration<Trip, OTAPush> pushConf = new RestConfiguration<>(pushRoute, token, getExaTrip, entity);
         return httpInvoker.accessResource(httpInvoker.sendPostMessage, pushConf);
+    }
+
+    @Override
+    public void setTime(long l) {
+        String token = getAccessToken();
+        List<String> pathParam = asList(TIME_URI, "currentTimeMillis");
+        Entity<String> entity = Entity.text(Long.toString(l));
+        RestConfiguration<Void, String> conf = new RestConfiguration<>(pathParam, token, x -> null, entity);
+        httpInvoker.accessResource(httpInvoker.sendPutMessage, conf);
     }
 
     private String getAccessToken(){

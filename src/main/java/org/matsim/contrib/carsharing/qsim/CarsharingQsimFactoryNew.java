@@ -1,20 +1,24 @@
 package org.matsim.contrib.carsharing.qsim;
 
-import javax.inject.Inject;
-
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
+import org.matsim.contrib.carsharing.manager.demand.SimulationTime;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
+import org.matsim.contrib.carsharing.rest.RestService;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
-import com.google.inject.Provider;
+import javax.inject.Inject;
+
+import static org.matsim.contrib.carsharing.entity.DateUtils.doubleTime2CurrentLongTime;
 
 /** 
  * 
@@ -26,6 +30,8 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 	@Inject EventsManager eventsManager;
 	@Inject CarsharingSupplyInterface carsharingSupply;
 	@Inject private CarsharingManagerInterface carsharingManager;
+	@Inject private RestService restService;
+	@Inject private SimulationTime simulationTime;
 
 	@Override
 	public Mobsim get() {
@@ -47,6 +53,9 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 		ParkCSVehicles parkSource = new ParkCSVehicles( qsim,
 				carsharingSupply);
 		qsim.addAgentSource(parkSource);
+		qsim.addQueueSimulationListeners((MobsimAfterSimStepListener) e ->
+				restService.setTime(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), qsim.getSimTimer().getTimeOfDay()))
+		);
 		return qsim;
 	}
 
