@@ -30,7 +30,6 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 	@Inject EventsManager eventsManager;
 	@Inject CarsharingSupplyInterface carsharingSupply;
 	@Inject private CarsharingManagerInterface carsharingManager;
-	@Inject private RestService restService;
 	@Inject private SimulationTime simulationTime;
 
 	@Override
@@ -54,7 +53,7 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 				carsharingSupply);
 		qsim.addAgentSource(parkSource);
 		qsim.addQueueSimulationListeners((MobsimAfterSimStepListener) e ->
-				restService.setTime(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), qsim.getSimTimer().getTimeOfDay()))
+				simulationTime.pushCurrentTimeMillis(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), qsim.getSimTimer().getTimeOfDay()))
 		);
 		return qsim;
 	}
