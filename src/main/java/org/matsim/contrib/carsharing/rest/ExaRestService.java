@@ -21,7 +21,6 @@ public class ExaRestService implements RestService{
 
     private static final String TRIP_SIM_URI = "exa-booking/rest/sim/trips";
     private static final String TRIP_URI = "exa-booking/rest/trips";
-    private static final String PUSH_URI = "exa-connection/rest/push";
     private static final String PUSH_SIM_URI = "exa-connection/rest/sim/push";
     private static final String TIME_URI = "exa-booking/rest/sim/time";
     private static final Logger log = Logger.getLogger(ExaRestService.class);
