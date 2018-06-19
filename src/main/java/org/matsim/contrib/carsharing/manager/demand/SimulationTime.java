@@ -16,7 +16,7 @@ public class SimulationTime {
 
     public SimulationTime() throws IOException {
         this.startingSimulationTime = setStartingTime();
-        Socket socket = new Socket("172.18.0.14", 1987);
+        Socket socket = new Socket("localhost", 1987);
         this.out = new PrintStream(socket.getOutputStream());
     }
 
