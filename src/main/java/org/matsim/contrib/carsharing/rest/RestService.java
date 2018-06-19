@@ -4,6 +4,7 @@ import org.matsim.contrib.carsharing.entity.Trip;
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
 
 import java.math.BigInteger;
+import java.time.Instant;
 
 public interface RestService {
 
@@ -12,13 +13,16 @@ public interface RestService {
 
     Trip rentCar(RentalInfo rentalInfo);
 
-    void startTrip(Trip trip);
+    void startTrip(BigInteger tripId, Instant time);
 
     Trip cancelTrip(BigInteger id);
 
     Trip endTrip(RentalInfo RentalInfo);
 
-    void setTime(long l);
-
     void clearTrips();
+
+    void openDoors(BigInteger carId);
+
+    void closeDoors(BigInteger carId);
+
 }

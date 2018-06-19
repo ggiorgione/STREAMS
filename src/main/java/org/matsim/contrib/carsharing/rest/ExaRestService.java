@@ -10,6 +10,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,8 +23,7 @@ public class ExaRestService implements RestService{
     private static final String TRIP_SIM_URI = "exa-booking/rest/sim/trips";
     private static final String TRIP_URI = "exa-booking/rest/trips";
     private static final String PUSH_SIM_URI = "exa-connection/rest/sim/push";
-    private static final String TIME_URI = "exa-booking/rest/sim/time";
-    private static final Logger log = Logger.getLogger(ExaRestService.class);
+    private static final String ACTION_URI = "exa-connection/rest/actions";
 
     @Inject
     private KeycloakTokenManager tokenManager;
@@ -58,11 +58,11 @@ public class ExaRestService implements RestService{
     }
 
     @Override
-    public void startTrip(Trip trip) {
+    public void startTrip(BigInteger tripId, Instant time) {
         List<String> pushRoute = asList(PUSH_SIM_URI, "key", "pickup");
         MultivaluedHashMap<String, String> params = new MultivaluedHashMap<>();
-        params.add("tripId", trip.getId().toString());
-        params.add("beginDate", instant2String(trip.getRealStart().toInstant()));
+        params.add("tripId", tripId.toString());
+        params.add("beginDate", instant2String(time));
         // TODO: What's the purpose of 'route'?
         RestConfiguration<Void, String> pushConf = new RestConfiguration<>(
                 null,
@@ -92,20 +92,36 @@ public class ExaRestService implements RestService{
     }
 
     @Override
-    public void setTime(long l) {
-        String token = getAccessToken();
-        List<String> pathParam = asList(TIME_URI, "currentTimeMillis");
-        Entity<String> entity = Entity.text(Long.toString(l));
-        RestConfiguration<Void, String> conf = new RestConfiguration<>(pathParam, token, x -> null, entity);
-        httpInvoker.accessResource(httpInvoker.sendPutMessage, conf);
-    }
-
-    @Override
     public void clearTrips() {
         String token = getAccessToken();
         List<String> pathParam = asList(TRIP_SIM_URI);
         RestConfiguration<Void, Void> conf = new RestConfiguration<>(pathParam, token, x -> null);
         httpInvoker.accessResource(httpInvoker.deleteMessage, conf);
+    }
+
+    @Override
+    public void openDoors(BigInteger carId) {
+        setDoorStatus(carId, true);
+    }
+
+    @Override
+    public void closeDoors(BigInteger carId) {
+        setDoorStatus(carId, false);
+    }
+
+    private void setDoorStatus(BigInteger carId, boolean open) {
+        List<String> pushRoute = asList(ACTION_URI, "doors", carId.toString());
+        MultivaluedHashMap<String, String> params = new MultivaluedHashMap<>();
+        params.add("open", Boolean.toString(open));
+        // TODO: What's the purpose of 'route'?
+        RestConfiguration<Void, String> pushConf = new RestConfiguration<>(
+                null,
+                params,
+                pushRoute,
+                getAccessToken(),
+                r -> null,
+                Entity.text(""));
+        httpInvoker.accessResource(httpInvoker.sendPutMessage, pushConf);
     }
 
     private String getAccessToken(){

@@ -72,8 +72,6 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 		personTripIdMap = new HashMap<>();
 
-		tripIds.stream().forEach(restService::cancelTrip);
-
 		tripIds = new HashSet<>();
 
 		restService.clearTrips();
@@ -133,10 +131,6 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		Trip trip = restService.rentCar(info);
 		tripIds.add(trip.getId());
 		personTripIdMap.put(event.getPersonId(), trip.getId());
-		// TODO start the trip when the customer enters the car
-		Instant realStart = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), event.getTime()));
-		trip.setRealStart(Date.from(realStart));
-		restService.startTrip(trip);
 
 	}
 
@@ -173,8 +167,12 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 					info.setAccessEndTime(event.getTime());
 
 			}
+			Instant startTime = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), event.getTime()));
+			restService.startTrip(personTripIdMap.get(personId), startTime);
+			BigInteger carId = new BigInteger(event.getVehicleId().toString());
+			restService.openDoors(carId);
 		}
-		
+
 	}
 
 	@Override
@@ -192,6 +190,8 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 				info.setInVehicleTime(info.getInVehicleTime() + totalTime);
 
 			}
+			BigInteger carId = new BigInteger(event.getVehicleId().toString());
+			restService.closeDoors(carId);
 		}
 	}
 
