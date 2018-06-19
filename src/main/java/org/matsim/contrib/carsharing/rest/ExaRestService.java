@@ -51,7 +51,7 @@ public class ExaRestService implements RestService{
         Trip trip = rentalInfo2Trip(rentalInfo);
 
         LinkedList<String> pathParams = new LinkedList<>();
-        pathParams.add(TRIP_SIM_URI);
+        pathParams.add(TRIP_URI);
 
         RestConfiguration<Trip, Trip> bookingConf = new RestConfiguration<>(pathParams, getAccessToken(), getExaTrip, Entity.entity(trip, MediaType.APPLICATION_JSON));
 
