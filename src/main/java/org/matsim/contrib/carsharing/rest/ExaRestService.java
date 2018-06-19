@@ -100,6 +100,14 @@ public class ExaRestService implements RestService{
         httpInvoker.accessResource(httpInvoker.sendPutMessage, conf);
     }
 
+    @Override
+    public void clearTrips() {
+        String token = getAccessToken();
+        List<String> pathParam = asList(TRIP_SIM_URI);
+        RestConfiguration<Void, Void> conf = new RestConfiguration<>(pathParam, token, x -> null);
+        httpInvoker.accessResource(httpInvoker.deleteMessage, conf);
+    }
+
     private String getAccessToken(){
         return tokenManager.getToken().getAccessToken();
     }

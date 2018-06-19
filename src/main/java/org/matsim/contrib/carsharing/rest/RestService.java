@@ -19,4 +19,6 @@ public interface RestService {
     Trip endTrip(RentalInfo RentalInfo);
 
     void setTime(long l);
+
+    void clearTrips();
 }

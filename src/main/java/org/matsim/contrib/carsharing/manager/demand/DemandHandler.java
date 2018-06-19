@@ -75,6 +75,8 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		tripIds.stream().forEach(restService::cancelTrip);
 
 		tripIds = new HashSet<>();
+
+		restService.clearTrips();
 	}
 
 	@Override
