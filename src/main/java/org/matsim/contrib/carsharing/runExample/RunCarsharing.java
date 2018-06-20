@@ -36,8 +36,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import java.io.IOException;
 import java.util.Set;
 
 
@@ -56,7 +59,7 @@ public class RunCarsharing {
 
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		Logger.getLogger( "org.matsim.core.controler.Injector" ).setLevel(Level.OFF);
 
@@ -89,7 +92,7 @@ public class RunCarsharing {
 		log.info("Scenarios path: " + PATH + " Config file name : " + CONFIG_XML_FILE + " Examotive file: " + CONFIG_EXAMOTIVE_FILE);
 	}
 
-	public static void installCarSharing(final Controler controler) {		
+	public static void installCarSharing(final Controler controler) throws IOException {
 		
 		final Scenario scenario = controler.getScenario();
 		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(scenario.getNetwork());
@@ -125,7 +128,7 @@ public class RunCarsharing {
 
 		final HttpInvoker httpInvoker = new HttpInvoker();
 		final RestService restService = new ExaRestService();
-
+		final SimulationTime simulationTime = new SimulationTime();
 
 
 		controler.addOverridingModule(new AbstractModule() {
@@ -147,7 +150,7 @@ public class RunCarsharing {
 				bind(PropertyManager.class).to(PropertyManagerImpl.class);
 				bind(RestClientImpl.class).asEagerSingleton();
 				bind(KeycloakTokenManager.class).asEagerSingleton();
-				bind(SimulationTime.class).asEagerSingleton();
+				bind(SimulationTime.class).toInstance(simulationTime);
 
 				bind(HttpInvoker.class).toInstance(httpInvoker);
 				bind(RestService.class).toInstance(restService);
@@ -167,8 +170,12 @@ public class RunCarsharing {
 			
 			
 		
-		});		
-		
+		});
+
+		controler.addControlerListener(
+				(ShutdownListener) event -> simulationTime.notifyStop()
+		);
+
 		//=== carsharing specific replanning strategies ===
 		
 		controler.addOverridingModule( new AbstractModule() {

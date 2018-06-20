@@ -109,6 +109,17 @@ public class ExaRestService implements RestService{
         setDoorStatus(carId, false);
     }
 
+    @Override
+    public void startEngine(BigInteger carId) {
+        List<String> route = asList(ACTION_URI, "engines", carId.toString());
+        RestConfiguration<Void, String> pushConf = new RestConfiguration<>(
+                route,
+                getAccessToken(),
+                r -> null,
+                Entity.text(""));
+        httpInvoker.accessResource(httpInvoker.sendPutMessage, pushConf);
+    }
+
     private void setDoorStatus(BigInteger carId, boolean open) {
         List<String> pushRoute = asList(ACTION_URI, "doors", carId.toString());
         MultivaluedHashMap<String, String> params = new MultivaluedHashMap<>();

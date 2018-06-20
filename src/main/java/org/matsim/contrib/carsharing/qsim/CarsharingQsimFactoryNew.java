@@ -5,10 +5,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
 import org.matsim.contrib.carsharing.manager.demand.SimulationTime;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
-import org.matsim.contrib.carsharing.rest.RestService;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -52,8 +53,8 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 		ParkCSVehicles parkSource = new ParkCSVehicles( qsim,
 				carsharingSupply);
 		qsim.addAgentSource(parkSource);
-		qsim.addQueueSimulationListeners((MobsimAfterSimStepListener) e ->
-				simulationTime.pushCurrentTimeMillis(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), qsim.getSimTimer().getTimeOfDay()))
+		qsim.addQueueSimulationListeners((MobsimBeforeSimStepListener) e ->
+				simulationTime.setCurrentTimeMillis(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), qsim.getSimTimer().getTimeOfDay()))
 		);
 		return qsim;
 	}

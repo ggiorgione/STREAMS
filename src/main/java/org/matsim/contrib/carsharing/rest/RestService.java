@@ -25,4 +25,5 @@ public interface RestService {
 
     void closeDoors(BigInteger carId);
 
+    void startEngine(BigInteger carId);
 }

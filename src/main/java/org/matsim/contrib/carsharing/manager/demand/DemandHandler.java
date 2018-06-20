@@ -171,6 +171,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 			restService.startTrip(personTripIdMap.get(personId), startTime);
 			BigInteger carId = new BigInteger(event.getVehicleId().toString());
 			restService.openDoors(carId);
+			restService.startEngine(carId);
 		}
 
 	}

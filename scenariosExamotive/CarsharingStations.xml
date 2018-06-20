@@ -3,7 +3,7 @@
 <companies>
 	<company name="Oply">
 		<twoway id="1" x="-375" y="0" >
-			<vehicle type="car" vehicleID="8861" />
+			<vehicle type="car" vehicleID="8811" />
 		</twoway>
 		<!--<twoway id="1" x="-375" y="0" >
 			<vehicle type="car" vehicleID="TW_1" />
