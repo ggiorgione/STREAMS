@@ -52,9 +52,6 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 	private Map<Id<Person>, BigInteger> personTripIdMap = new HashMap<>();
 
-	/** IDs of all trips that were created during the current iteration. */
-	private Set<BigInteger> tripIds = new HashSet<>();
-
 	@Override
 	public void reset(int iteration) {
 		agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();	
@@ -71,8 +68,6 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		simulationTime.resetSimulationTime();
 
 		personTripIdMap = new HashMap<>();
-
-		tripIds = new HashSet<>();
 
 		restService.clearTrips();
 	}
@@ -129,7 +124,6 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		}
 
 		Trip trip = restService.rentCar(info);
-		tripIds.add(trip.getId());
 		personTripIdMap.put(event.getPersonId(), trip.getId());
 
 	}
