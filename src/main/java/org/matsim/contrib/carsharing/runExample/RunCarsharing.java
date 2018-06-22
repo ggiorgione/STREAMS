@@ -1,10 +1,8 @@
 package org.matsim.contrib.carsharing.runExample;
 
 
-import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.google.inject.name.Names;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -36,7 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -128,7 +125,7 @@ public class RunCarsharing {
 
 		final HttpInvoker httpInvoker = new HttpInvoker();
 		final RestService restService = new ExaRestService();
-		final SimulationTime simulationTime = new SimulationTime();
+		final SimulationTimeProvider simulationTimeProvider = new SimulationTimeProvider();
 
 
 		controler.addOverridingModule(new AbstractModule() {
@@ -150,7 +147,7 @@ public class RunCarsharing {
 				bind(PropertyManager.class).to(PropertyManagerImpl.class);
 				bind(RestClientImpl.class).asEagerSingleton();
 				bind(KeycloakTokenManager.class).asEagerSingleton();
-				bind(SimulationTime.class).toInstance(simulationTime);
+				bind(SimulationTimeProvider.class).toInstance(simulationTimeProvider);
 
 				bind(HttpInvoker.class).toInstance(httpInvoker);
 				bind(RestService.class).toInstance(restService);
@@ -173,7 +170,7 @@ public class RunCarsharing {
 		});
 
 		controler.addControlerListener(
-				(ShutdownListener) event -> simulationTime.notifyStop()
+				(ShutdownListener) event -> simulationTimeProvider.notifyStop()
 		);
 
 		//=== carsharing specific replanning strategies ===

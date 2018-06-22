@@ -1,8 +1,7 @@
 package org.matsim.contrib.carsharing.manager.demand;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.carsharing.manager.demand.membership.SimulationTimeConnection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -11,30 +10,54 @@ import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SimulationTime extends Thread {
+public class SimulationTimeProvider extends Thread {
 
-    private static final Logger logger = LoggerFactory.getLogger(SimulationTime.class);
-
+    private static final Logger logger = Logger.getLogger(SimulationTimeProvider.class);
     private static final int MIN_TIME_PORT = 1988;
-
     private static final int NUM_MICROSERVICES = 9;
+    private static final int HEARTBEAT_RATE = 1000;
+    private static final int CONNECTION_TIMEOUT = 5000;
 
     private Set<SimulationTimeConnection> connections = new HashSet<>();
-
     private long currentTimeMillis;
-
     private long startingSimulationTime;
-
     private boolean running = true;
 
-    public SimulationTime() throws IOException {
+    public SimulationTimeProvider() throws IOException {
         this.startingSimulationTime = setStartingTime();
         for (int port = MIN_TIME_PORT; port < MIN_TIME_PORT + NUM_MICROSERVICES; port++) {
             SimulationTimeConnection connection = new SimulationTimeConnection(port);
             connection.connect();
             connections.add(connection);
         }
+        logger.info("simulation time provider is connected to all microservices");
         this.start();
+        new Thread(() -> {
+            int missedHeartbeatsBeforeTimeout = Math.round(CONNECTION_TIMEOUT / HEARTBEAT_RATE);
+            int missedHeartbeats = 0;
+            while (isRunning()) {
+                try {
+                    sleep(HEARTBEAT_RATE);
+                    for (SimulationTimeConnection c: connections) {
+                        if (c.receivedHeartbeat()) {
+                            c.acceptHeartbeat();
+                        } else {
+                            c.notifyMissedHeartbeat();
+                            if (c.getMissedHeartbeats() >= missedHeartbeatsBeforeTimeout) {
+                                logger.info("connection timed out, reconnecting");
+                                c.reconnect();
+                            }
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    logger.error("heartbeat thread of simulation time provider was interrupted", e);
+                } catch (IOException e) {
+                    logger.error("Exception in heartbeat thread of simulation time provider", e);
+                }
+                logger.debug("simulation time provider sends heartbeat");
+                connections.forEach(x -> x.sendHeartbeat());
+            }
+        }).start();
     }
 
     @Override
@@ -43,8 +66,7 @@ public class SimulationTime extends Thread {
             while (isRunning()) {
                 for (SimulationTimeConnection c: connections) {
                     try {
-                        if (c.requestedTime()) {
-                            logger.info("providing time");
+                        if (c.clientRequestedTime()) {
                             c.provideTime(getCurrentTimeMillis());
                         }
                     } catch (IOException e) {
@@ -53,18 +75,19 @@ public class SimulationTime extends Thread {
                 }
             }
         } finally {
-            cleanUp();
+            close();
         }
     }
 
-    private void cleanUp() {
+    private void close() {
         for (SimulationTimeConnection c: connections) {
             try {
                 c.close();
             } catch (IOException e) {
-                logger.error("exception while cleaning up simulation time provider", e);
+                logger.error("exception while disconnecting simulation time provider", e);
             }
         }
+        logger.info("disconnected simulation time provider");
     }
 
     public synchronized void setCurrentTimeMillis(long currentTimeMillis) {

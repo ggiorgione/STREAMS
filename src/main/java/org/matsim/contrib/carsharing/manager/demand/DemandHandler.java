@@ -40,7 +40,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 	@Inject Scenario scenario;
 	@Inject CarsharingSupplyInterface carsharingSupplyContainer;
 	@Inject RestService restService;
-	@Inject SimulationTime simulationTime;
+	@Inject SimulationTimeProvider simulationTimeProvider;
 
 	private Map<Id<Person>, AgentRentals> agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();	
 
@@ -65,7 +65,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		//Reset simulation time for next iteration and delete all bookings
 
 
-		simulationTime.resetSimulationTime();
+		simulationTimeProvider.resetSimulationTime();
 
 		personTripIdMap = new HashMap<>();
 
@@ -81,7 +81,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		agentRentals.getStatsPerVehicle().remove(event.getvehicleId());
 		info.setEndTime(event.getTime());
 		info.setEndLinkId(event.getLinkId());
-		Instant realEnd = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), event.getTime()));
+		Instant realEnd = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTimeProvider.getStartingSimulationTime(), event.getTime()));
 		info.setRealEnd(realEnd);
 		BigInteger tripId = personTripIdMap.remove(event.getPersonId());
 		info.setTripId(tripId);
@@ -161,7 +161,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 					info.setAccessEndTime(event.getTime());
 
 			}
-			Instant startTime = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTime.getStartingSimulationTime(), event.getTime()));
+			Instant startTime = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTimeProvider.getStartingSimulationTime(), event.getTime()));
 			restService.startTrip(personTripIdMap.get(personId), startTime);
 			BigInteger carId = new BigInteger(event.getVehicleId().toString());
 			restService.openDoors(carId);
