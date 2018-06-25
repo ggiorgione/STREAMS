@@ -29,7 +29,6 @@ public class SimulationTimeConnection {
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream());
         receivedHeartbeat = false;
-        pendingTimeRequests = 0;
         missedHeartbeats = 0;
     }
 
@@ -38,7 +37,6 @@ public class SimulationTimeConnection {
         in.close();
         socket.close();
         receivedHeartbeat = false;
-        pendingTimeRequests = 0;
         missedHeartbeats = 0;
     }
 
