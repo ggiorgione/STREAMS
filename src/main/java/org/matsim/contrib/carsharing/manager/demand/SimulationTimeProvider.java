@@ -14,7 +14,7 @@ public class SimulationTimeProvider extends Thread {
 
     private static final Logger logger = Logger.getLogger(SimulationTimeProvider.class);
     private static final int MIN_TIME_PORT = 1988;
-    private static final int NUM_MICROSERVICES = 9;
+    private static final int NUM_MICROSERVICES = 8;//Should be 9 but we discard scheduler microservice
     private static final int HEARTBEAT_RATE = 1000;
     private static final int CONNECTION_TIMEOUT = 2000;
 

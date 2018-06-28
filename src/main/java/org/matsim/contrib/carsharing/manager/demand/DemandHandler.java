@@ -31,18 +31,18 @@ import static org.matsim.contrib.carsharing.entity.DateUtils.doubleTime2CurrentL
 /**
  * @author balac
  */
-public class DemandHandler implements PersonLeavesVehicleEventHandler, 
-PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler, EndRentalEventHandler {
+public class DemandHandler implements PersonLeavesVehicleEventHandler,
+		PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler, EndRentalEventHandler {
 
 
 	private static final Logger log = Logger.getLogger(DemandHandler.class);
-	
+
 	@Inject Scenario scenario;
 	@Inject CarsharingSupplyInterface carsharingSupplyContainer;
 	@Inject RestService restService;
 	@Inject SimulationTimeProvider simulationTimeProvider;
 
-	private Map<Id<Person>, AgentRentals> agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();	
+	private Map<Id<Person>, AgentRentals> agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();
 
 	private Map<Id<Vehicle>, VehicleRentals> vehicleRentalsMap = new HashMap<Id<Vehicle>, VehicleRentals>();
 
@@ -54,7 +54,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 	@Override
 	public void reset(int iteration) {
-		agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();	
+		agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();
 
 		vehicleRentalsMap = new HashMap<Id<Vehicle>, VehicleRentals>();
 
@@ -76,7 +76,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 	public void handleEvent(EndRentalEvent event) {
 
 		AgentRentals agentRentals = this.agentRentalsMap.get(event.getPersonId());
-		
+
 		RentalInfo info = agentRentals.getStatsPerVehicle().get(event.getvehicleId());
 		agentRentals.getStatsPerVehicle().remove(event.getvehicleId());
 		info.setEndTime(event.getTime());
@@ -96,7 +96,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 		restService.endTrip(info);
 
-}
+	}
 
 	@Override
 	public void handleEvent(StartRentalEvent event) {
@@ -115,16 +115,17 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		if (agentRentalsMap.containsKey(event.getPersonId())) {
 			AgentRentals agentRentals = this.agentRentalsMap.get(event.getPersonId());
 			agentRentals.getStatsPerVehicle().put(event.getvehicleId(), info);
-			
+
 		}
 		else {
 			AgentRentals agentRentals = new AgentRentals(event.getPersonId());
-			agentRentalsMap.put(event.getPersonId(), agentRentals);			
-			agentRentals.getStatsPerVehicle().put(event.getvehicleId(), info);			
+			agentRentalsMap.put(event.getPersonId(), agentRentals);
+			agentRentals.getStatsPerVehicle().put(event.getvehicleId(), info);
 		}
 
 		Trip trip = restService.rentCar(info);
 		personTripIdMap.put(event.getPersonId(), trip.getId());
+
 
 	}
 
@@ -141,7 +142,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 				info.setDistance(info.getDistance() + network.getLinks().get(event.getLinkId()).getLength());
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -150,7 +151,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		if (carsharingTrip(event.getVehicleId())) {
 			this.vehiclePersonMap.put(event.getVehicleId(), event.getPersonId());
 			this.enterVehicleTimes.put(event.getPersonId(), event.getTime());
-			
+
 			Id<Person> personId = this.vehiclePersonMap.get(event.getVehicleId());
 
 			if (agentRentalsMap.containsKey(event.getPersonId())) {
@@ -164,8 +165,8 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 			Instant startTime = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTimeProvider.getStartingSimulationTime(), event.getTime()));
 			restService.startTrip(personTripIdMap.get(personId), startTime);
 			BigInteger carId = new BigInteger(event.getVehicleId().toString());
-			restService.openDoors(carId);
-			restService.startEngine(carId);
+			//restService.openDoors(carId);
+			//restService.startEngine(carId);
 		}
 
 	}
@@ -174,7 +175,7 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 
 		if (carsharingTrip(event.getVehicleId())) {
-			double enterTime = this.enterVehicleTimes.get(event.getPersonId());	
+			double enterTime = this.enterVehicleTimes.get(event.getPersonId());
 			double totalTime = event.getTime() - enterTime;
 
 			Id<Person> personId = this.vehiclePersonMap.get(event.getVehicleId());
@@ -186,13 +187,13 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 			}
 			BigInteger carId = new BigInteger(event.getVehicleId().toString());
-			restService.closeDoors(carId);
+			//restService.closeDoors(carId);
 		}
 	}
 
 	private boolean carsharingTrip(Id<Vehicle> vehicleId) {
 
-		return this.carsharingSupplyContainer.getAllVehicles().containsKey(vehicleId.toString());		
+		return this.carsharingSupplyContainer.getAllVehicles().containsKey(vehicleId.toString());
 	}
 
 	public Map<Id<Person>, AgentRentals> getAgentRentalsMap() {
