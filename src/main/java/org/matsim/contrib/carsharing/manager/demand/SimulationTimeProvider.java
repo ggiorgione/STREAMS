@@ -2,6 +2,7 @@ package org.matsim.contrib.carsharing.manager.demand;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.carsharing.manager.demand.membership.SimulationTimeConnection;
+import org.matsim.core.events.algorithms.TimeProvider;
 
 import java.io.*;
 import java.time.LocalDate;
@@ -10,7 +11,9 @@ import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SimulationTimeProvider extends Thread {
+import static java.lang.Thread.sleep;
+
+public class SimulationTimeProvider extends TimeProvider implements Runnable {
 
     private static final Logger logger = Logger.getLogger(SimulationTimeProvider.class);
     private static final int MIN_TIME_PORT = 1988;
@@ -31,7 +34,7 @@ public class SimulationTimeProvider extends Thread {
             connections.add(connection);
         }
         logger.info("simulation time provider is connected to all microservices");
-        this.start();
+        new Thread(this).start();
         new Thread(() -> {
             int missedHeartbeatsBeforeTimeout = Math.round(CONNECTION_TIMEOUT / HEARTBEAT_RATE);
             int missedHeartbeats = 0;
@@ -67,7 +70,7 @@ public class SimulationTimeProvider extends Thread {
                 for (SimulationTimeConnection c: connections) {
                     try {
                         if (c.clientRequestedTime()) {
-                            c.provideTime(getCurrentTimeMillis());
+                            c.provideTime(currentTimeMillis());
                         }
                     } catch (IOException e) {
                         logger.error("exception while listening for time requests", e);
@@ -94,7 +97,7 @@ public class SimulationTimeProvider extends Thread {
         this.currentTimeMillis = currentTimeMillis;
     }
 
-    private synchronized long getCurrentTimeMillis() {
+    public synchronized long currentTimeMillis() {
         return currentTimeMillis;
     }
 
