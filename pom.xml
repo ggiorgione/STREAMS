@@ -22,7 +22,7 @@
     <properties>
         <jersey.version>2.27</jersey.version>
         <jackson.version>2.9.3</jackson.version>
-        <matsim.version>0.10.0</matsim.version>
+        <matsim.version>0.11.0-SNAPSHOT</matsim.version>
         <rxjava2.version>2.1.14</rxjava2.version>
     </properties>
 

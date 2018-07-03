@@ -1,10 +1,10 @@
-package org.matsim.contrib.carsharing.manager.demand;
+package org.matsim.contrib.carsharing.simulationTime;
 
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.carsharing.manager.demand.membership.SimulationTimeConnection;
-import org.matsim.core.events.algorithms.TimeProvider;
 
-import java.io.*;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -13,7 +13,8 @@ import java.util.Set;
 
 import static java.lang.Thread.sleep;
 
-public class SimulationTimeProvider extends TimeProvider implements Runnable {
+@Singleton
+public class SimulationTimeProvider implements Runnable {
 
     private static final Logger logger = Logger.getLogger(SimulationTimeProvider.class);
     private static final int MIN_TIME_PORT = 1988;

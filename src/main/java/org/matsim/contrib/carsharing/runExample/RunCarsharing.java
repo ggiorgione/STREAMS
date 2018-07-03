@@ -9,7 +9,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
 import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandler;
-import org.matsim.contrib.carsharing.manager.*;
+import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
+import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
+import org.matsim.contrib.carsharing.manager.PropertyManager;
+import org.matsim.contrib.carsharing.manager.PropertyManagerImpl;
 import org.matsim.contrib.carsharing.manager.demand.*;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipReader;
@@ -27,15 +30,13 @@ import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrat
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.rest.*;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
+import org.matsim.contrib.carsharing.simulationTime.SimulationTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.events.algorithms.EventWriterInflux;
-import org.matsim.core.events.algorithms.TimeProvider;
+import org.matsim.core.influx.InfluxModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.InfluxManager;
 
 import java.io.IOException;
 import java.util.Set;
@@ -125,9 +126,6 @@ public class RunCarsharing {
 
 		final HttpInvoker httpInvoker = new HttpInvoker();
 		final RestService restService = new ExaRestService();
-		final SimulationTimeProvider simulationTimeProvider = new SimulationTimeProvider();
-
-		final InfluxManager influxManager = new InfluxManager("http://localhost:8086");
 
 		controler.addOverridingModule(new AbstractModule() {
 
@@ -148,11 +146,6 @@ public class RunCarsharing {
 				bind(PropertyManager.class).to(PropertyManagerImpl.class);
 				bind(RestClientImpl.class).asEagerSingleton();
 				bind(KeycloakTokenManager.class).asEagerSingleton();
-				bind(SimulationTimeProvider.class).toInstance(simulationTimeProvider);
-				bind(TimeProvider.class).toInstance(simulationTimeProvider);
-
-				bind(InfluxManager.class).toInstance(influxManager);
-				bind(EventWriterInflux.class).asEagerSingleton();
 
 				bind(HttpInvoker.class).toInstance(httpInvoker);
 				bind(RestService.class).toInstance(restService);
@@ -174,9 +167,8 @@ public class RunCarsharing {
 		
 		});
 
-		controler.addControlerListener(
-				(ShutdownListener) event -> simulationTimeProvider.notifyStop()
-		);
+		controler.addOverridingModule(new SimulationTimeModule(controler));
+		controler.addOverridingModule(new InfluxModule("http://localhost:8086"));
 
 		//=== carsharing specific replanning strategies ===
 		

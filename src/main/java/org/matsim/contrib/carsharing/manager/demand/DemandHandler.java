@@ -20,6 +20,7 @@ import org.matsim.contrib.carsharing.events.handlers.EndRentalEventHandler;
 import org.matsim.contrib.carsharing.events.handlers.StartRentalEventHandler;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.rest.RestService;
+import org.matsim.contrib.carsharing.simulationTime.SimulationTimeProvider;
 import org.matsim.vehicles.Vehicle;
 
 import java.math.BigInteger;

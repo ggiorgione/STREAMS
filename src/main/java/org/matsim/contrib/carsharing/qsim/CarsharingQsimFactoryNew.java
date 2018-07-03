@@ -3,7 +3,7 @@ package org.matsim.contrib.carsharing.qsim;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
-import org.matsim.contrib.carsharing.manager.demand.SimulationTimeProvider;
+import org.matsim.contrib.carsharing.simulationTime.SimulationTimeProvider;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
