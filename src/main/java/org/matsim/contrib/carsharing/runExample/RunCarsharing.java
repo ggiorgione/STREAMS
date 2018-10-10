@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.util.Set;
 
 
+
+
 /** 
  * @author balac
  */
@@ -54,6 +56,7 @@ public class RunCarsharing {
 	private static String PATH = null;
 	private static String CONFIG_XML_FILE = null;
 	private static String CONFIG_EXAMOTIVE_FILE = null;
+	private static String URL_INFLUX_DB = null;
 
 
 
@@ -68,7 +71,13 @@ public class RunCarsharing {
 		
 		if(Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
 			Logger.getLogger( "org.matsim.core.controler" ).warn("Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
-		
+
+        int numberOfThreads = Integer.parseInt(config.getModule("global").getValue("numberOfThreads"));
+        Logger.getLogger("org.matsim.core.controler" ).info("Number of Thread for replanning");
+
+        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+        config.parallelEventHandling().setNumberOfThreads(1);
+
 		CarsharingUtils.addConfigModules(config);
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
@@ -86,8 +95,9 @@ public class RunCarsharing {
 		PATH = args[0];
 		CONFIG_XML_FILE = args[1];
 		CONFIG_EXAMOTIVE_FILE = args[2];
+		URL_INFLUX_DB = args[3];
 
-		log.info("Scenarios path: " + PATH + " Config file name : " + CONFIG_XML_FILE + " Examotive file: " + CONFIG_EXAMOTIVE_FILE);
+		log.info("Scenarios path: " + PATH + " Config file name : " + CONFIG_XML_FILE + " Examotive file: " + CONFIG_EXAMOTIVE_FILE + " InfluxDb URL: " + URL_INFLUX_DB);
 	}
 
 	public static void installCarSharing(final Controler controler) throws IOException {
@@ -168,7 +178,7 @@ public class RunCarsharing {
 		});
 
 		controler.addOverridingModule(new SimulationTimeModule(controler));
-		controler.addOverridingModule(new InfluxModule("http://localhost:8086"));
+		controler.addOverridingModule(new InfluxModule(URL_INFLUX_DB));
 
 		//=== carsharing specific replanning strategies ===
 		

@@ -2,6 +2,7 @@ package org.matsim.contrib.carsharing.rest;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.carsharing.manager.PropertyManager;
 import org.matsim.contrib.carsharing.rest.oauth.OauthUtils;
 
 import javax.ws.rs.client.ClientBuilder;
@@ -11,7 +12,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 import java.util.function.Function;
+
+import static org.matsim.contrib.carsharing.manager.PropertyManager.IS_BACKEND_ENABLED;
 
 public class HttpInvoker {
 
@@ -22,6 +27,9 @@ public class HttpInvoker {
 
     @Inject
     private RestClientImpl restClient;
+
+    @Inject
+    private PropertyManager propertyManager;
 
 
     private WebTarget addParameters(MultivaluedMap<String, String> params, WebTarget target) {
@@ -69,15 +77,19 @@ public class HttpInvoker {
      */
 
     protected <R, D> R accessResource(Function<RestConfiguration, Response> callFn, RestConfiguration<R, D> restConf) {
+        Properties properties = propertyManager.getAppExaProperties();
+        if(Boolean.valueOf(properties.getProperty(IS_BACKEND_ENABLED))){
+            Response response = callFn.apply(restConf);
+            if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED || response.getStatus() == HttpURLConnection.HTTP_FORBIDDEN) {
+                return handleUnauthorizedResponseStatus(callFn, restConf);
+            } else if (response.getStatus() >= HttpURLConnection.HTTP_OK && response.getStatus() < HttpURLConnection.HTTP_MULT_CHOICE) {
+                return apply(restConf, response);
+            } else {
+                return handleUnknownResponseStatus(response, restConf);
+            }
+        }else
+            return null;
 
-        Response response = callFn.apply(restConf);
-        if (response.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED || response.getStatus() == HttpURLConnection.HTTP_FORBIDDEN) {
-            return handleUnauthorizedResponseStatus(callFn, restConf);
-        } else if (response.getStatus() >= HttpURLConnection.HTTP_OK && response.getStatus() < HttpURLConnection.HTTP_MULT_CHOICE) {
-            return apply(restConf, response);
-        } else {
-            return handleUnknownResponseStatus(response, restConf);
-        }
 
     }
 

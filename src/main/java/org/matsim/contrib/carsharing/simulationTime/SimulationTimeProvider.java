@@ -1,7 +1,9 @@
 package org.matsim.contrib.carsharing.simulationTime;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.carsharing.manager.PropertyManager;
 import org.matsim.contrib.carsharing.manager.demand.membership.SimulationTimeConnection;
 
 import java.io.IOException;
@@ -9,9 +11,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import static java.lang.Thread.sleep;
+import static org.matsim.contrib.carsharing.manager.PropertyManager.IS_BACKEND_ENABLED;
 
 @Singleton
 public class SimulationTimeProvider implements Runnable {
@@ -27,41 +31,49 @@ public class SimulationTimeProvider implements Runnable {
     private long startingSimulationTime;
     private boolean running = true;
 
-    public SimulationTimeProvider() throws IOException {
-        this.startingSimulationTime = setStartingTime();
-        for (int port = MIN_TIME_PORT; port < MIN_TIME_PORT + NUM_MICROSERVICES; port++) {
-            SimulationTimeConnection connection = new SimulationTimeConnection(port);
-            connection.connect();
-            connections.add(connection);
-        }
-        logger.info("simulation time provider is connected to all microservices");
-        new Thread(this).start();
-        new Thread(() -> {
-            int missedHeartbeatsBeforeTimeout = Math.round(CONNECTION_TIMEOUT / HEARTBEAT_RATE);
-            int missedHeartbeats = 0;
-            while (isRunning()) {
-                try {
-                    sleep(HEARTBEAT_RATE);
-                    for (SimulationTimeConnection c: connections) {
-                        if (c.receivedHeartbeat()) {
-                            c.acceptHeartbeat();
-                        } else {
-                            c.notifyMissedHeartbeat();
-                            if (c.getMissedHeartbeats() >= missedHeartbeatsBeforeTimeout) {
-                                logger.info("connection timed out, reconnecting");
-                                c.reconnect();
+    @Inject
+    public SimulationTimeProvider(PropertyManager propertyManager) throws IOException {
+        Properties properties = propertyManager.getAppExaProperties();
+
+        if(Boolean.valueOf(properties.getProperty(IS_BACKEND_ENABLED))){
+            this.startingSimulationTime = setStartingTime();
+            for (int port = MIN_TIME_PORT; port < MIN_TIME_PORT + NUM_MICROSERVICES; port++) {
+                SimulationTimeConnection connection = new SimulationTimeConnection(port);
+                connection.connect();
+                connections.add(connection);
+            }
+            logger.info("simulation time provider is connected to all microservices");
+            new Thread(this).start();
+            new Thread(() -> {
+                int missedHeartbeatsBeforeTimeout = Math.round(CONNECTION_TIMEOUT / HEARTBEAT_RATE);
+                int missedHeartbeats = 0;
+                while (isRunning()) {
+                    try {
+                        sleep(HEARTBEAT_RATE);
+                        for (SimulationTimeConnection c: connections) {
+                            if (c.receivedHeartbeat()) {
+                                c.acceptHeartbeat();
+                            } else {
+                                c.notifyMissedHeartbeat();
+                                if (c.getMissedHeartbeats() >= missedHeartbeatsBeforeTimeout) {
+                                    logger.info("connection timed out, reconnecting");
+                                    c.reconnect();
+                                }
                             }
                         }
+                    } catch (InterruptedException e) {
+                        logger.error("heartbeat thread of simulation time provider was interrupted", e);
+                    } catch (IOException e) {
+                        logger.error("Exception in heartbeat thread of simulation time provider", e);
                     }
-                } catch (InterruptedException e) {
-                    logger.error("heartbeat thread of simulation time provider was interrupted", e);
-                } catch (IOException e) {
-                    logger.error("Exception in heartbeat thread of simulation time provider", e);
+                    logger.debug("simulation time provider sends heartbeat");
+                    connections.forEach(x -> x.sendHeartbeat());
                 }
-                logger.debug("simulation time provider sends heartbeat");
-                connections.forEach(x -> x.sendHeartbeat());
-            }
-        }).start();
+            }).start();
+
+        }
+
+
     }
 
     @Override

@@ -136,7 +136,7 @@ public class ExaRestService implements RestService{
     }
 
     private String getAccessToken(){
-        return tokenManager.getToken().getAccessToken();
+        return tokenManager.getToken()!=null ? tokenManager.getToken().getAccessToken() :null;
     }
 
 

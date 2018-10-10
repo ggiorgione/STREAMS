@@ -13,6 +13,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import java.util.Properties;
 
+import static org.matsim.contrib.carsharing.manager.PropertyManager.IS_BACKEND_ENABLED;
+
 public class RestClientImpl implements RestClient{
 
 
@@ -24,19 +26,23 @@ public class RestClientImpl implements RestClient{
     public RestClientImpl(PropertyManager propertyManager) {
         Properties properties = propertyManager.getAppExaProperties();
 
-        final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(100);
-        connectionManager.setDefaultMaxPerRoute(20);
+        if(Boolean.valueOf(properties.getProperty(IS_BACKEND_ENABLED))){
+            final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+            connectionManager.setMaxTotal(100);
+            connectionManager.setDefaultMaxPerRoute(20);
 
-        final ClientConfig cc = new ClientConfig();
-        cc.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
-        cc.property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, true);
-        cc.connectorProvider(new ApacheConnectorProvider());
+            final ClientConfig cc = new ClientConfig();
+            cc.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
+            cc.property(ApacheClientProperties.CONNECTION_MANAGER_SHARED, true);
+            cc.connectorProvider(new ApacheConnectorProvider());
 
-        this.client = ClientBuilder.newClient(cc);
-        //this.client = ClientBuilder.newClient();
+            this.client = ClientBuilder.newClient(cc);
+            //this.client = ClientBuilder.newClient();
 
-        this.target = client.target(properties.getProperty("serverpath"));
+            this.target = client.target(properties.getProperty("serverpath"));
+        }
+
+
     }
 
     @Override

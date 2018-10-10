@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class PropertyManagerImpl implements PropertyManager{
 
-    private final static Logger log = Logger.getLogger(RunCarsharing.class);
+    private final static Logger log = Logger.getLogger(PropertyManagerImpl.class);
 
     private Properties appExaProperties;
 

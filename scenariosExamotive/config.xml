@@ -11,7 +11,7 @@
 
 	<module name="controler" >
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="1" />
+		<param name="lastIteration" value="10" />
 		<param name="outputDirectory" value="&OUTBASE;" />
 		<param name="eventsFileFormat" value="influx" />
 		<param name="legHistogramFormat" value="influx" />
@@ -35,6 +35,7 @@
 			<param name="flowCapacityFactor" value="1"   />
 			<param name="storageCapacityFactor" value="10.0"   />
 			<param name="mainMode" value="car,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
+			<param name="numberOfThreads" value="8" />
 		</module>
 
     <module name="Carsharing" >
@@ -90,9 +91,8 @@
 
 	<module name="global" >
 		<param name="coordinateSystem" value="Atlantis" /> <!-- Atlantis, CH1903_LV03 -->
-		<param name="numberOfThreads" value="4" />
 		<param name="randomSeed" value="4711" />
-		<param name="numberOfThreads" value="7" />
+		<param name="numberOfThreads" value="8" />
 	</module>
 
 

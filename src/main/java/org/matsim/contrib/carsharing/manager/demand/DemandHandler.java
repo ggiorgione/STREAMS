@@ -125,7 +125,7 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 		}
 
 		Trip trip = restService.rentCar(info);
-		personTripIdMap.put(event.getPersonId(), trip.getId());
+		personTripIdMap.put(event.getPersonId(), trip!=null ? trip.getId() : BigInteger.ZERO);
 
 
 	}

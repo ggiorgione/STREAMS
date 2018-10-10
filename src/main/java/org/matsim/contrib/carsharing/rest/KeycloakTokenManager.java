@@ -15,6 +15,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static org.matsim.contrib.carsharing.manager.PropertyManager.IS_BACKEND_ENABLED;
 import static org.matsim.contrib.carsharing.rest.oauth.OAuthConstants.*;
 
 public class KeycloakTokenManager implements TokenManager{
@@ -43,20 +44,22 @@ public class KeycloakTokenManager implements TokenManager{
     public void retrieveToken() {
         write.lock();
         try {
-            Form form = new Form();
-            form.param(GRANT_TYPE, GRANT_TYPE_CLIENT_CREDENTIALS)
-                    .param(CLIENT_SECRET, properties.getProperty("keycloak.client.secret"))
-                    .param(CLIENT_ID, properties.getProperty("keycloack.clientId"));
+            if(Boolean.valueOf(properties.getProperty(IS_BACKEND_ENABLED))){
+                Form form = new Form();
+                form.param(GRANT_TYPE, GRANT_TYPE_CLIENT_CREDENTIALS)
+                        .param(CLIENT_SECRET, properties.getProperty("keycloak.client.secret"))
+                        .param(CLIENT_ID, properties.getProperty("keycloack.clientId"));
 
-            WebTarget webTarget = restClient.getClient().target(properties.getProperty("keycloak.token.uri"));
-            Response response = webTarget.request(MediaType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
+                WebTarget webTarget = restClient.getClient().target(properties.getProperty("keycloak.token.uri"));
+                Response response = webTarget.request(MediaType.APPLICATION_FORM_URLENCODED).post(Entity.form(form));
 
-            if (response.getStatus() >= HTTP_OK && response.getStatus() < HTTP_REDIRECTION) {
-                token = response.readEntity(Token.class);
-            } else if (response.getStatus() == HTTP_UNAUTHORIZED || response.getStatus() == HTTP_FORBIDDEN) {
-                throw new RuntimeException("Could not retrieve access token");
-            } else
-                throw new RuntimeException("Remote server call failed status: " + response.getStatus());
+                if (response.getStatus() >= HTTP_OK && response.getStatus() < HTTP_REDIRECTION) {
+                    token = response.readEntity(Token.class);
+                } else if (response.getStatus() == HTTP_UNAUTHORIZED || response.getStatus() == HTTP_FORBIDDEN) {
+                    throw new RuntimeException("Could not retrieve access token");
+                } else
+                    throw new RuntimeException("Remote server call failed status: " + response.getStatus());
+            }
 
         }finally {
             write.unlock();
