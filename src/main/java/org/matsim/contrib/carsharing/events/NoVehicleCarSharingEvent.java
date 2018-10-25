@@ -3,6 +3,11 @@ package org.matsim.contrib.carsharing.events;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class NoVehicleCarSharingEvent extends Event{
 
@@ -16,12 +21,15 @@ public class NoVehicleCarSharingEvent extends Event{
 
 	private String companyId;
 
-	public NoVehicleCarSharingEvent(double time, String carsharingType, String companyId, Link currentLink, Link destinationLink) {
+	private Id<Person> personId;
+
+	public NoVehicleCarSharingEvent(double time, String carsharingType, String companyId, Link currentLink, Link destinationLink, Id<Person> personId) {
 		super(time);
 		this.originLinkId = currentLink.getId();
 		this.destinationLinkId = destinationLink.getId();
 		this.carsharingType = carsharingType;
 		this.companyId = companyId;
+		this.personId = personId;
 	}
 
 	@Override
@@ -44,4 +52,33 @@ public class NoVehicleCarSharingEvent extends Event{
 	public String getCompanyId() {
 		return this.companyId;
 	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = new LinkedHashMap<String, String>();
+		attr.put(ATTRIBUTE_TYPE, getEventType());
+		attr.put("OriginLinkId", originLinkId!=null ? originLinkId.toString() : null);
+		attr.put("DestinationLinkId", destinationLinkId!=null ? destinationLinkId.toString() : null);
+		attr.put("CarsharingType", carsharingType);
+		attr.put("CompanyId", companyId);
+		attr.put("Personid", personId!=null ? personId.toString() : null);
+
+		return attr;
+	}
+
+	@Override
+	public String toString() {
+		Map<String,String> attr = this.getAttributes() ;
+		StringBuilder eventXML = new StringBuilder("\t<event ");
+		for (Map.Entry<String, String> entry : attr.entrySet()) {
+			eventXML.append(entry.getKey());
+			eventXML.append("=\"");
+			eventXML.append(entry.getValue());
+			eventXML.append("\" ");
+		}
+		eventXML.append(" />");
+		return eventXML.toString();
+	}
+
+
 }
