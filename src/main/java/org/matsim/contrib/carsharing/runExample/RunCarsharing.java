@@ -75,9 +75,6 @@ public class RunCarsharing {
         int numberOfThreads = Integer.parseInt(config.getModule("global").getValue("numberOfThreads"));
         Logger.getLogger("org.matsim.core.controler" ).info("Number of Thread for replanning");
 
-        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
-        config.parallelEventHandling().setNumberOfThreads(1);
-
 		CarsharingUtils.addConfigModules(config);
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);

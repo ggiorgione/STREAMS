@@ -86,14 +86,16 @@ public class VehicleChoiceAgentImpl implements VehicleChoiceAgent {
 				if (utility > maxUtility) {
 					maxUtility = utility;
 					chosenVehicle = vehicle;
-				}	
+				}
 			}
 			catch (NullPointerException e) {
 				log.warn("Encountered nullpointerexception while estimating walk travel time!");
 				continue;
 			}
 		}
-		
+
+
+
 		return chosenVehicle;
 	}
 	
