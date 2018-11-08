@@ -28,7 +28,17 @@ public class NoVehicleAtStationCarSharingEvent extends Event{
 	private String vehicleType;
 
 
-
+	/**
+	 * Constructor NoVehicleAtStationCarSharingEvent class
+	 * @param time
+	 * @param originLinkId
+	 * @param destinationLinkId
+	 * @param carsharingType
+	 * @param companyId
+	 * @param personId
+	 * @param carsharingStation
+	 * @param vehicleType
+	 */
 	public NoVehicleAtStationCarSharingEvent(double time, Link originLinkId, Link destinationLinkId, String carsharingType, String companyId, Id<Person> personId, CarsharingStation carsharingStation, String vehicleType) {
 		super(time);
 		this.originLinkId = originLinkId;
