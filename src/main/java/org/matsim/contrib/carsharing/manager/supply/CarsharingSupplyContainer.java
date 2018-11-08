@@ -73,7 +73,7 @@ implements CarsharingSupplyInterface {
 		
 		CompanyContainer companyContainer = this.companies.get(companyId);
 		VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
-		return vehiclesContainer.findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance);		
+		return vehiclesContainer.findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance, carsharingStation -> {});
 	}		
 
 	

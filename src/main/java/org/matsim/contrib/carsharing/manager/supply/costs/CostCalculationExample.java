@@ -39,9 +39,9 @@ public class CostCalculationExample implements CostCalculation {
 
 		double costLu = scaleTOMatchCar * (evalTime + evalDist);
 
-		log.warn("==========> TIME " + evalTime);
-		log.warn("==========> DIST " + evalDist);
-		log.warn("__________> cost " + costLu);
+//		log.warn("==========> TIME " + evalTime);
+//		log.warn("==========> DIST " + evalDist);
+//		log.warn("__________> cost " + costLu);
 
 		return costLu;
 

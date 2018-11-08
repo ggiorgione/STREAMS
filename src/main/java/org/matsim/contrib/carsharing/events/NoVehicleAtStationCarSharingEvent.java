@@ -4,18 +4,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.stations.CarsharingStation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
-public class NoVehicleCarSharingEvent extends Event{
+public class NoVehicleAtStationCarSharingEvent extends Event{
 
-	public static final String EVENT_TYPE = "no carsharing vehicle";
+	public static final String EVENT_TYPE = "no carsharing vehicle at station";
 
-	private final Id<Link> originLinkId;
+	private final Link originLinkId;
 
-	private final Id<Link> destinationLinkId;
+	private final Link destinationLinkId;
 
 	private final String carsharingType;
 
@@ -23,13 +23,21 @@ public class NoVehicleCarSharingEvent extends Event{
 
 	private Id<Person> personId;
 
-	public NoVehicleCarSharingEvent(double time, String carsharingType, String companyId, Link currentLink, Link destinationLink, Id<Person> personId) {
+	private CarsharingStation carsharingStation;
+
+	private String vehicleType;
+
+
+
+	public NoVehicleAtStationCarSharingEvent(double time, Link originLinkId, Link destinationLinkId, String carsharingType, String companyId, Id<Person> personId, CarsharingStation carsharingStation, String vehicleType) {
 		super(time);
-		this.originLinkId = currentLink.getId();
-		this.destinationLinkId = destinationLink.getId();
+		this.originLinkId = originLinkId;
+		this.destinationLinkId = destinationLinkId;
 		this.carsharingType = carsharingType;
 		this.companyId = companyId;
 		this.personId = personId;
+		this.carsharingStation = carsharingStation;
+		this.vehicleType = vehicleType;
 	}
 
 	@Override
@@ -37,11 +45,11 @@ public class NoVehicleCarSharingEvent extends Event{
 		return EVENT_TYPE;
 	}
 
-	public Id<Link> getOriginLinkId(){
+	public Link getOriginLinkId(){
 		return this.originLinkId;
 	}
 
-	public Id<Link> getDestinationLinkId(){
+	public Link getDestinationLinkId(){
 		return this.destinationLinkId;
 	}
 
@@ -53,15 +61,29 @@ public class NoVehicleCarSharingEvent extends Event{
 		return this.companyId;
 	}
 
+	public Id<Person> getPersonId() {
+		return personId;
+	}
+
+	public CarsharingStation getCarsharingStation() {
+		return carsharingStation;
+	}
+
+	public String getVehicleType() {
+		return vehicleType;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = new LinkedHashMap<String, String>();
 		attr.put(ATTRIBUTE_TYPE, getEventType());
-		attr.put("OriginLinkId", originLinkId!=null ? originLinkId.toString() : "");
-		attr.put("DestinationLinkId", destinationLinkId!=null ? destinationLinkId.toString() : "");
+		attr.put("OriginLinkId", originLinkId!=null ? (originLinkId.getId()!=null ? originLinkId.getId().toString() : "") : "");
+		attr.put("DestinationLinkId", destinationLinkId!=null ? (destinationLinkId.getId()!=null ? destinationLinkId.getId().toString() : "") : "");
 		attr.put("CarsharingType", carsharingType);
 		attr.put("CompanyId", companyId);
 		attr.put("Personid", personId!=null ? personId.toString() : "");
+		attr.put("StationId", carsharingStation!=null ? carsharingStation.getStationId() : "");
+		attr.put("VehicleType", vehicleType);
 
 		return attr;
 	}

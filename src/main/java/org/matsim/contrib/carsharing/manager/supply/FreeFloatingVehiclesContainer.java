@@ -2,12 +2,18 @@ package org.matsim.contrib.carsharing.manager.supply;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.qsim.FreefloatingAreas;
+import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.contrib.carsharing.vehicles.FFVehicleImpl;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.SearchableNetwork;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -86,7 +92,12 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 	}
 
 	@Override
-	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance) {
+	public CSVehicle findClosestAvailableVehicle(EventsManager eventsManager, Double time, Link startLink, String typeOfVehicle, double searchDistance, Id<Person> personId, String carsharingType, Link destinationLink) {
+		return findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance, carsharingStation-> {});
+	}
+
+	@Override
+	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance, Consumer<CarsharingStation> fireEvent) {
 		Collection<CSVehicle> location = 
 				availableFFVehicleLocationQuadTree.getDisk(startLink.getCoord().getX(), 
 						startLink.getCoord().getY(), searchDistance);

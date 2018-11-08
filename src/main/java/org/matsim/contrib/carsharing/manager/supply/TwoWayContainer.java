@@ -1,16 +1,22 @@
 package org.matsim.contrib.carsharing.manager.supply;
 
-import java.util.Collection;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.events.NoVehicleAtStationCarSharingEvent;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.function.Consumer;
 /** 
  * @author balac
  */
@@ -21,6 +27,7 @@ public class TwoWayContainer implements VehiclesContainer{
 	private Map<String, CarsharingStation> twowaycarsharingstationsMap;
 	private Map<CSVehicle, Link> twvehiclesMap;
 
+	@Inject
 	public TwoWayContainer(QuadTree<CarsharingStation> twvehicleLocationQuadTree,
 			Map<String, CarsharingStation> twowaycarsharingstationsMap, Map<CSVehicle, Link> twvehiclesMap) {
 		
@@ -64,8 +71,16 @@ public class TwoWayContainer implements VehiclesContainer{
 	}
 
 	@Override
-	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance) {
-			Collection<CarsharingStation> location = 
+	public CSVehicle findClosestAvailableVehicle(EventsManager eventsManager, Double time, Link startLink, String typeOfVehicle, double searchDistance, Id<Person> personId, String carsharingType, Link destinationLink) {
+
+		Consumer<CarsharingStation> fireEvent = station -> eventsManager.processEvent(new NoVehicleAtStationCarSharingEvent(time, startLink, destinationLink, carsharingType, "", personId, station, typeOfVehicle));
+
+		return findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance, fireEvent);
+	}
+
+	@Override
+	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance, Consumer<CarsharingStation> fireEvent) {
+			Collection<CarsharingStation> location =
 				this.twvehicleLocationQuadTree.getDisk(startLink.getCoord().getX(), 
 						startLink.getCoord().getY(), searchDistance);
 		if (location.isEmpty()) return null;
@@ -77,10 +92,12 @@ public class TwoWayContainer implements VehiclesContainer{
 			
 			Coord coord = station.getLink().getCoord();
 			
-			if (CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord) < closestFound 
-					&& ((TwoWayCarsharingStation)station).getNumberOfVehicles(typeOfVehicle) > 0) {
-				closest = station;
-				closestFound = CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord);
+			if (CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord) < closestFound){
+					if (((TwoWayCarsharingStation)station).getNumberOfVehicles(typeOfVehicle) > 0) {
+						closest = station;
+						closestFound = CoordUtils.calcEuclideanDistance(startLink.getCoord(), coord);
+					}else
+						fireEvent.accept(station);
 			}
 		}
 		
@@ -91,6 +108,7 @@ public class TwoWayContainer implements VehiclesContainer{
 		
 		return null;
 	}
+
 
 	@Override
 	public Link findClosestAvailableParkingLocation(Link destinationLink, double searchDistance) {

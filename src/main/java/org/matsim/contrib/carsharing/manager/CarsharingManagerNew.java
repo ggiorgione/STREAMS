@@ -118,7 +118,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			Set<CSVehicle> offeredVehicles = new HashSet<>();
 			for (CompanyAgent companyAgent : this.carsharingSupplyContainer.getCompanyAgents().values()) {
 				
-				CSVehicle offeredVehicle = companyAgent.vehicleRequest(person.getId(), startLink, destinationLink, carsharingType, typeOfVehicle);
+				CSVehicle offeredVehicle = companyAgent.vehicleRequest(eventsManager, time, person.getId(), startLink, destinationLink, carsharingType, typeOfVehicle);
 				
 				if (offeredVehicle != null)
 					offeredVehicles.add(offeredVehicle);				

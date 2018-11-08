@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 public class CompanyAgentImpl implements CompanyAgent {
 	
@@ -14,8 +15,8 @@ public class CompanyAgentImpl implements CompanyAgent {
 	}
 	
 	@Override
-	public CSVehicle vehicleRequest(Id<Person> personId, Link locationLink, Link destinationLink,
-			String carsharingType, String vehicleType) {
+	public CSVehicle vehicleRequest(EventsManager eventsManager, Double time, Id<Person> personId, Link locationLink, Link destinationLink,
+									String carsharingType, String vehicleType) {
 
 		VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
 		
@@ -23,7 +24,7 @@ public class CompanyAgentImpl implements CompanyAgent {
 			
 			//Depending on the company strategy
 			//here the company just provides the closest vehicle in the search radius
-			CSVehicle vehicle = vehiclesContainer.findClosestAvailableVehicle(locationLink, vehicleType, 1000.0);
+			CSVehicle vehicle = vehiclesContainer.findClosestAvailableVehicle(eventsManager, time, locationLink, vehicleType, 1000.0, personId, carsharingType, destinationLink);
 			
 			return vehicle;
 		}
