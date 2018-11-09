@@ -111,7 +111,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 				}
 
 
-				if (marginalUtilityOfMoney != 0.0) {
+				if (marginalUtilityOfMoney != 0.0 && availCars != 0) {
 					//adds the cost per time and distance over number of available cars
 					score += -1 * ((this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), //here the cost becomes negative for the scoring part
 							rentalInfo.getCarsharingType(), rentalInfo) * marginalUtilityOfMoney)/availCars);
