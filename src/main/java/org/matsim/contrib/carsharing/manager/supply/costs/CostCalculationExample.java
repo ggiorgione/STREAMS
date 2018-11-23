@@ -114,22 +114,13 @@ public class CostCalculationExample implements CostCalculation {
 
 			double evalDist = distCost * (distance / 1000);
 
-			//If vertical pricing is enabled
-			/*if(pricing.equals("vertical")) {
-				System.out.println("------------------------In vertical-------------------------"+pricing);
-				int availableCars = 0;//getAvailableCars(rentalInfo);
-				if(availableCars > 0) {
-					costLu = Double.valueOf(df.format(scaleTOMatchCar * (evalTime + evalDist)))/availableCars; //need to divide by availabe cars
-				}
-			}else {*/
-				costLu = Double.valueOf(df.format(scaleTOMatchCar * (evalTime + evalDist)));
-			//}
+			costLu = Double.valueOf(df.format(scaleTOMatchCar * (evalTime + evalDist)));
 		}
 
 		System.out.println("---------------------------> Cost "+costLu);
-		rentalInfo.setTripCost(costLu);
-		System.out.println(rentalInfo.toString());
-		return costLu;
+		//rentalInfo.setTripCost(costLu);
+		//System.out.println(rentalInfo.toString());
+		return costLu/100;
 
 	}
 

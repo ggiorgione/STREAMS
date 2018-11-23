@@ -92,29 +92,42 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 
 
 
-				int availCars = 1;
+				int availCars = 0;
 
 				//Gets the configuration value of available cars disabling/enabling
 				boolean activateAvailCars = Boolean.parseBoolean(this.config.getModules().get("TwoWayCarsharing").getParams().get("activateAvailCars"));
 
 				//Calculates value of available cars if it is not disabled in config.xml
-				if(activateAvailCars) {
+				//if(activateAvailCars) {
 
-					//get the station of the nearest vehicle to the person
-					CarsharingStation nearestStation = ((TwoWayContainer) this.carsharingSupplyContainer
-							.getCompany(vehicle.getCompanyId()).getVehicleContainer("twoway"))
-							.getTwowaycarsharingstationsMap()
-							.get(((StationBasedVehicle) vehicle).getStationId());
+				//get the station of the nearest vehicle to the person
+				CarsharingStation nearestStation = ((TwoWayContainer) this.carsharingSupplyContainer
+						.getCompany(vehicle.getCompanyId()).getVehicleContainer("twoway"))
+						.getTwowaycarsharingstationsMap()
+						.get(((StationBasedVehicle) vehicle).getStationId());
 
-					//gets the number of available cars in the nearest station
-					availCars = ((TwoWayCarsharingStation) nearestStation).getNumberOfVehicles(vehicle.getType());
+				//gets the number of available cars in the nearest station
+				availCars = ((TwoWayCarsharingStation) nearestStation).getNumberOfVehicles(vehicle.getType());
+				//}
+				
+				String pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
+				
+				double cost = this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), 
+						rentalInfo.getCarsharingType(), rentalInfo);
+				
+				if(pricing.equals("vertical") || (pricing.equals("horizontal") && activateAvailCars)) {
+					if(availCars > 0)
+						cost = cost/availCars;
+					else
+						cost = 99999999999999999999.0;				
 				}
+				System.out.println("---------------------------> Leg score Cost "+cost);
+				rentalInfo.setTripCost(cost);
+				System.out.println(rentalInfo.toString());
 
-
-				if (marginalUtilityOfMoney != 0.0 && availCars != 0) {
+				if (marginalUtilityOfMoney != 0.0) {
 					//adds the cost per time and distance over number of available cars
-					score += -1 * ((this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), //here the cost becomes negative for the scoring part
-							rentalInfo.getCarsharingType(), rentalInfo) * marginalUtilityOfMoney)/availCars);
+					score += -1 * (cost * marginalUtilityOfMoney); //here the cost becomes negative for the scoring part
 
 				}
 

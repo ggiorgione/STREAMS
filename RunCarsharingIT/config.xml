@@ -53,9 +53,9 @@
         <param name="votTwoWayCarsharing" value="1.0"/>
         <param name="activateVot" value="false"/> <!-- "true" activates VOT as part of scoring and "false" disables it -->
         <param name="activateAvailCars" value="false"/> <!-- "true" activates Available cars as part of cost and "false" disables it -->
-		<param name="pricing" value="vertical" /><!-- Default:base; it can also take a value of "vertical" or "horizontal"; Defines the pricing type. -->
-		<param name="priceBaseDriving" value="0.45"/> <!-- Driving price used for both vertical and base pricing types -->
-		<param name="priceBaseStop" value="0.2"/> <!-- Stop price used for both vertical and base pricing types -->
+		<param name="pricing" value="base" /><!-- Default:base; it can also take a value of "vertical" or "horizontal"; Defines the pricing type. -->
+		<param name="priceBaseDriving" value="0.3"/> <!-- Driving price used for both vertical and base pricing types -->
+		<param name="priceBaseStop" value="0.3"/> <!-- Stop price used for both vertical and base pricing types -->
 		<param name="priceHighRateHorizontal" value="0.45"/> <!-- High rate price used for Horizontal pricing type -->
 		<param name="priceLowRateHorizontal" value="0.2"/> <!-- Low rate price used for Horizontal pricing type -->
 	</module>

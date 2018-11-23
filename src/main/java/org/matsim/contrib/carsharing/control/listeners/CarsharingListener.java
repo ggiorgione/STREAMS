@@ -28,6 +28,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  *
@@ -263,6 +264,36 @@ E													outLink.newLine();
 
 			time2StationW.flush();
 			time2StationW.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//************************************************
+		//PROVA Nirmeen Trip Coat FROM 
+		//************************************************
+
+		final BufferedWriter RentalCost = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "RentalCost.txt"));
+
+		try {
+			RentalCost.write("personID,carID,cost");
+			RentalCost.newLine();
+
+			for (Id<Person> personId: agentRentalsMap.keySet()) {
+
+				for (RentalInfo i : agentRentalsMap.get(personId).getArr()) {
+					//CSVehicle vehicle = this.carsharingSupply.getAllVehicles().get(i.getVehId().toString());
+					Id<Vehicle> VehId = i.getVehId();
+					double tripCost = i.getTripCost();
+					RentalCost.write(personId + "," + VehId + "," + tripCost);
+					RentalCost.newLine();
+				}
+
+			}
+
+			RentalCost.flush();
+			RentalCost.close();
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
