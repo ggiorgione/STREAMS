@@ -3,3 +3,9 @@ target/
 test/
 *.iml
 .classpath
+.project
+.settings/
+RunCarsharingIT/CSMembership.xml
+RunCarsharingIT/_plans.xml
+RunCarsharingIT/plans.xml
+RunCarsharingIT/plansAttributes.xml

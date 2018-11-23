@@ -10,14 +10,14 @@
 
 	<module name="controler" >
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="100" />
+		<param name="lastIteration" value="4" />
 		<!--<param name="outputDirectory" value="/Users/giulio.giorgione/Documents/Carsharing/test/output/org/matsim/contrib/carsharing/runExample/RunCarsharingIT/" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="writePlansInterval" value="10" />
 		<param name="writeEventsInterval" value="10" />-->
 		<param name="outputDirectory" value="&OUTBASE;" />
-		<param name="eventsFileFormat" value="influx" />
-		<param name="legHistogramFormat" value="influx" />
+		<param name="eventsFileFormat" value="xml" />
+		<!--< param name="legHistogramFormat" value="influx" /> -->
 		<param name="writePlansInterval" value="1" />
 		<param name="writeEventsInterval" value="1" />
 		<param name="routingAlgorithmType" value="Dijkstra" />
@@ -51,8 +51,13 @@
         <param name="useTwoWayCarsharing" value="true" />
         <param name="searchDistanceTwoWayCarsharing" value="1000.0" />
         <param name="votTwoWayCarsharing" value="1.0"/>
-        <param name="disableVot" value="true"/> <!-- "true" disables considering VOT as part of scoring and "false" enables it -->
-        <param name="disableAvailCars" value="true"/> <!-- "true" disables considering Available cars as part of scoring and "false" enables it -->
+        <param name="activateVot" value="false"/> <!-- "true" activates VOT as part of scoring and "false" disables it -->
+        <param name="activateAvailCars" value="false"/> <!-- "true" activates Available cars as part of cost and "false" disables it -->
+		<param name="pricing" value="vertical" /><!-- Default:base; it can also take a value of "vertical" or "horizontal"; Defines the pricing type. -->
+		<param name="priceBaseDriving" value="0.45"/> <!-- Driving price used for both vertical and base pricing types -->
+		<param name="priceBaseStop" value="0.2"/> <!-- Stop price used for both vertical and base pricing types -->
+		<param name="priceHighRateHorizontal" value="0.45"/> <!-- High rate price used for Horizontal pricing type -->
+		<param name="priceLowRateHorizontal" value="0.2"/> <!-- Low rate price used for Horizontal pricing type -->
 	</module>
 
 <!-- ====================================================================== -->

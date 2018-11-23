@@ -73,10 +73,10 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 				score += Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("constantTwoWayCarsharing"));
 
 				//Gets the configuration value of person VOT disabling/enabling
-				boolean disableVot = Boolean.parseBoolean(this.config.getModules().get("TwoWayCarsharing").getParams().get("disableVot"));
+				boolean activateVot = Boolean.parseBoolean(this.config.getModules().get("TwoWayCarsharing").getParams().get("activateVot"));
 
 				//Calculates person Vot is it is not disabled in config.xml
-				if(!disableVot) {
+				if(activateVot) {
 
 					double personVoT = 1;
 					if( person.getAttributes().getAttribute("vot") != null) {
@@ -95,10 +95,10 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 				int availCars = 1;
 
 				//Gets the configuration value of available cars disabling/enabling
-				boolean disableAvailCars = Boolean.parseBoolean(this.config.getModules().get("TwoWayCarsharing").getParams().get("disableAvailCars"));
+				boolean activateAvailCars = Boolean.parseBoolean(this.config.getModules().get("TwoWayCarsharing").getParams().get("activateAvailCars"));
 
 				//Calculates value of available cars if it is not disabled in config.xml
-				if(!disableAvailCars) {
+				if(activateAvailCars) {
 
 					//get the station of the nearest vehicle to the person
 					CarsharingStation nearestStation = ((TwoWayContainer) this.carsharingSupplyContainer

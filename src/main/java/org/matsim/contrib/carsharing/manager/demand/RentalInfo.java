@@ -120,6 +120,8 @@ public class RentalInfo {
 	private Instant realEnd;
 
 	private BigInteger tripId;
+	
+	private double  tripCost = 0.0;
 
 	public TripTypes getTripTypes() {
 		return tripTypes;
@@ -153,6 +155,13 @@ public class RentalInfo {
 	public void setRealEnd(Instant realEnd) {
 		this.realEnd = realEnd;
 	}
+	
+	public Double getTripCost() {
+		return tripCost;
+	}
+	public void setTripCost(Double tripCost) {
+		this.tripCost = tripCost;
+	}
 
 	public String toString() {
 		
@@ -160,6 +169,6 @@ public class RentalInfo {
 				originLinkId + "," + pickupLinkId + "," +	dropoffLinkId + "," + endLinkId + "," + 
 				Double.toString(distance) + "," + Double.toString(inVehicleTime) + "," +
 				Double.toString(accessEndTime - accessStartTime) + "," + Double.toString(egressEndTime - egressStartTime) +
-		"," + vehId;
+		"," + vehId + "," + tripCost ;
 	}
 }

@@ -42,7 +42,7 @@ public class CarsharingUtils {
     	return config;
 		
 	}
-	public static CostsCalculatorContainer createCompanyCostsStructure(Set<String> companies) {
+	public static CostsCalculatorContainer createCompanyCostsStructure(Set<String> companies,Config config) {
 		
 		CostsCalculatorContainer companyCostsContainer = new CostsCalculatorContainer();
 		
@@ -52,9 +52,9 @@ public class CarsharingUtils {
 			
 			//=== here customizable cost structures come in ===
 			//===what follows is just an example!! and should be modified according to the study at hand===
-			costCalculations.put("freefloating", new CostCalculationExample());
-			costCalculations.put("twoway", new CostCalculationExample());
-			costCalculations.put("oneway", new CostCalculationExample());
+			costCalculations.put("freefloating", new CostCalculationExample(config));
+			costCalculations.put("twoway", new CostCalculationExample(config));
+			costCalculations.put("oneway", new CostCalculationExample(config));
 			CompanyCosts companyCosts = new CompanyCosts(costCalculations);
 			
 			companyCostsContainer.getCompanyCostsMap().put(s, companyCosts);

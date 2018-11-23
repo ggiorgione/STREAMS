@@ -26,10 +26,19 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	
 	private String votTwoWayCarsharing = null;
 
-	private String disableVot = "false";
+	private String activateVot = "false";
 
-	private String disableAvailCars = "false";
+	private String activateAvailCars = "false";
 
+	private String pricing = null;
+
+	private Double priceBaseDriving = null;
+
+	private Double priceBaseStop = null;
+	
+	private Double priceHighRateHorizontal = null;
+	
+	private Double priceLowRateHorizontal = null;
 
 
 	public TwoWayCarsharingConfigGroup() {
@@ -126,24 +135,74 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 		this.votTwoWayCarsharing = votTwoWayCarsharing;
 	}
 
-	@StringGetter( "disableVot" )
-	public String getDisableVot() {
-		return disableVot;
+	@StringGetter( "activateVot" )
+	public String getActivateVot() {
+		return activateVot;
 	}
-	@StringSetter( "disableVot" )
-	public void setDisableVot(String disableVot) {
-		this.disableVot = disableVot;
+	@StringSetter( "activateVot" )
+	public void setActivateVot(String activateVot) {
+		this.activateVot = activateVot;
 	}
 	
-	@StringGetter( "disableAvailCars" )
-	public String getDisableAvailCars() {
-		return disableAvailCars;
+	@StringGetter( "activateAvailCars" )
+	public String getActivateAvailCars() {
+		return activateAvailCars;
 	}
-	@StringSetter( "disableAvailCars" )
-	public void setDisableAvailCars(String disableAvailCars) {
-		this.disableAvailCars = disableAvailCars;
+	@StringSetter( "activateAvailCars" )
+	public void setActivateAvailCars(String activateAvailCars) {
+		this.activateAvailCars = activateAvailCars;
 	}
 
+	@StringGetter( "pricing" )
+	public String getPricing() {
+		return pricing;
+	}
+
+	@StringSetter( "pricing" )
+	public void setPricing(String pricing) {
+		this.pricing = pricing;
+	}
+
+	@StringGetter( "priceBaseDriving" )
+	public Double getPriceBaseDriving() {
+		return priceBaseDriving;
+	}
+
+	@StringSetter( "priceBaseDriving" )
+	public void setPriceBaseDriving(Double priceBaseDriving) {
+		this.priceBaseDriving = priceBaseDriving;
+	}
+
+	@StringGetter( "priceBaseStop" )
+	public Double getPriceBaseStop() {
+		return priceBaseStop;
+	}
+
+	@StringSetter( "priceBaseStop" )
+	public void setPriceBaseStop(Double priceBaseStop) {
+		this.priceBaseStop = priceBaseStop;
+	}
+
+	@StringGetter( "priceHighRateHorizontal" )
+	public Double getPriceHighRateHorizontal() {
+		return priceHighRateHorizontal;
+	}
+	
+	@StringSetter( "priceHighRateHorizontal" )
+	public void setPriceHighRateHorizontal(Double priceHighRateHorizontal) {
+		this.priceHighRateHorizontal = priceHighRateHorizontal;
+	}
+
+	@StringGetter( "priceLowRateHorizontal" )
+	public Double getPriceLowRateHorizontal() {
+		return priceLowRateHorizontal;
+	}
+
+	@StringSetter( "priceLowRateHorizontal" )
+	public void setPriceLowRateHorizontal(Double priceLowRateHorizontal) {
+		this.priceLowRateHorizontal = priceLowRateHorizontal;
+	}
+	
 
 }
 

@@ -211,7 +211,7 @@ public class RunCarsharing {
 
 		final MembershipContainer memberships = membershipReader.getMembershipContainer();
 		
-		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
+		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies,scenario.getConfig());
 		
 		final CarsharingListener carsharingListener = new CarsharingListener();
 		//final CarsharingSupplyInterface carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());

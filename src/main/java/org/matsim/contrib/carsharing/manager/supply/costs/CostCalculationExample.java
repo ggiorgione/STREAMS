@@ -1,92 +1,219 @@
 package org.matsim.contrib.carsharing.manager.supply.costs;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
+import java.text.DecimalFormat;
+
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
-/** 
+import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
+import org.matsim.contrib.carsharing.manager.supply.TwoWayContainer;
+import org.matsim.contrib.carsharing.stations.CarsharingStation;
+import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
+import org.matsim.contrib.carsharing.vehicles.CSVehicle;
+import org.matsim.contrib.carsharing.vehicles.StationBasedVehicle;
+import org.matsim.core.config.Config;
+
+import com.google.inject.Inject;
+
+/**
  * @author balac
  */
 public class CostCalculationExample implements CostCalculation {
 
-	private final static double betaTravel = 15; // 6.0;
-	private final static double betaRentalTIme = 1.0; //I don't think this should exist
-	private final static double betaDistance = 0.0; // 0.0;
-	private final static double betaWalking = 100.0;
+	
+
 	private final static double scaleTOMatchCar = 1.0; // 0.325; SCENDERE E VEDERE CHE SUCCEDE
-	private final static double betaVOT = 10.0; // 1.0;
-	private final static double timeCost = 0.2;
-	private final static double stopCost = 0.2;
-
 	private final static double distCost = 0;
-	private final static double carsAvailable = 1.0;
-	private final static double alfaCS = 1.0;
-	private Person person;
-	//COST here ct =  0.20 and cd  = 0
+	private static double priceBaseDriving = 0.3;
+	private static double priceBaseStop = 0.3;
+	@Inject private CarsharingSupplyInterface carsharingSupplyContainer;
 
-	private static final Logger log = Logger.getLogger(CostCalculationExample.class);
+	Config config;
+	String pricing = "base";
+	double priceHighRateHorizontal = 0.3;
+	double priceLowRateHorizontal = 0.15;
+
+	DecimalFormat df = new DecimalFormat("#.##");   
+
+	public CostCalculationExample(Config config) {
+		super();
+		this.config = config;
+		//gets  dynamicPricing, priceHighRateHorizontal and priceLowRateHorizontal values from configration file
+		pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
+		priceBaseDriving = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceBaseDriving"));
+		priceBaseStop = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceBaseStop"));
+		priceHighRateHorizontal = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceHighRateHorizontal"));
+		priceLowRateHorizontal = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceLowRateHorizontal"));
+	}
+	// COST here ct = 0.20 and cd = 0
 
 	@Override
 	public double getCost(RentalInfo rentalInfo) {
+		
+		double ST = rentalInfo.getStartTime();
+		double ET = rentalInfo.getEndTime();
 
-		double rentalTime = rentalInfo.getEndTime() - rentalInfo.getStartTime();
-		double inVehicleTime = rentalInfo.getInVehicleTime();
-		double distance = rentalInfo.getDistance();
+		double costLu = 0;
+		
+		//If horizontal pricing
+		if (pricing.equals("horizontal")) {
+			//Start and end time from seconds to hours
+			double ST_Hour = ST / 3600;
+			double ET_Hour = ET / 3600;
 
+			// StartTime slot upper bound
+			double ST_UB = getTimeSlotBound(ST_Hour, "upper");
 
-		double evalTime = (timeCost * (rentalTime / 60)) + ((rentalTime - inVehicleTime) / 60.0 * stopCost);
+			// Time until next slot in hour
+			double LB = ST_UB - ST_Hour;
 
-		double evalDist = distCost * (distance / 1000);
+			//Start time slot cost
+			double ST_SlotCost = getTimeSlotCost(ST_Hour);
+			
+			// Cost until the end of the first time slot
+			double Cb = LB * 60 * ST_SlotCost;
 
-		double costLu = scaleTOMatchCar * (evalTime + evalDist);
+			// EndTime slot Lower bound
+			double ET_LB = getTimeSlotBound(ET_Hour, "lower");
 
-//		log.warn("==========> TIME " + evalTime);
-//		log.warn("==========> DIST " + evalDist);
-//		log.warn("__________> cost " + costLu);
+			// Time until next slot in hour
+			double UB = ET_Hour - ET_LB;
 
+			//End time slot cost
+			double ET_SlotCost = getTimeSlotCost(ET_Hour);
+			
+			// Cost until the end of the first time slot
+			double Ce = UB * 60 * ET_SlotCost;
+
+			// Remaining time in hours
+			int TI = (int) Math.abs(ET_LB - ST_UB);
+			
+			//Ci
+			double Ci = 0.0;
+			if((TI/3) % 2 == 0) {
+				Ci = ((TI/2)*60)*priceHighRateHorizontal+((TI/2)*60)*priceLowRateHorizontal;
+			}else if((TI/3) == 1.0) {
+				if(ST_SlotCost == priceHighRateHorizontal) {
+					Ci = TI*60*priceLowRateHorizontal;
+				}else {
+					Ci = TI*60*priceLowRateHorizontal;
+				}
+			}else if(TI == 0){
+				Ci = 0;
+			}else {
+				Ci = (((TI-1)/2)*60)*priceHighRateHorizontal+(((TI-1)/2)*60)*priceLowRateHorizontal+(1*60*ST_SlotCost);
+			}
+			costLu = Double.valueOf(df.format(Cb + Ce + Ci));
+			
+		}//If horizontal pricing is disabled
+		else {
+
+			double rentalTime = ET - ST;
+			double inVehicleTime = rentalInfo.getInVehicleTime();
+			double distance = rentalInfo.getDistance();
+
+			double evalTime = (priceBaseDriving * (rentalTime / 60)) + ((rentalTime - inVehicleTime) / 60.0 * priceBaseStop);
+
+			double evalDist = distCost * (distance / 1000);
+
+			//If vertical pricing is enabled
+			/*if(pricing.equals("vertical")) {
+				System.out.println("------------------------In vertical-------------------------"+pricing);
+				int availableCars = 0;//getAvailableCars(rentalInfo);
+				if(availableCars > 0) {
+					costLu = Double.valueOf(df.format(scaleTOMatchCar * (evalTime + evalDist)))/availableCars; //need to divide by availabe cars
+				}
+			}else {*/
+				costLu = Double.valueOf(df.format(scaleTOMatchCar * (evalTime + evalDist)));
+			//}
+		}
+
+		System.out.println("---------------------------> Cost "+costLu);
+		rentalInfo.setTripCost(costLu);
+		System.out.println(rentalInfo.toString());
 		return costLu;
 
+	}
 
-		/*double accessTime = rentalInfo.getAccessEndTime() - rentalInfo.getAccessStartTime();
-		double egressTime = rentalInfo.getEgressEndTime() - rentalInfo.getEgressStartTime();*/
-		//double personVot = 1;// (double) person.getAttributes().getAttribute("vot");
-		/*double evaVot = CostCalculationExample.betaVOT / personVot;
-		double evaWalk = CostCalculationExample.betaWalking * ((accessTime + egressTime) / 3600);
-		double evaTrav = CostCalculationExample.betaTravel * (inVehicleTime / 3600);
-		double distTrav = CostCalculationExample.betaRentalTIme * (evaTrav + evaDist);*/
 
-		//double costLu = scaleTOMatchCar * (CostCalculationExample.alfaCS + evaVot + distTrav + evaWalk + evaTrav);
+	//get the upper/lower bound of the timeSlot of the input time
+	public double getTimeSlotBound(double time, String bound) {
 
-		// need to insert the available cars carsAvailable (1/aj) under
-		// (CostCalculationExample.rentalCost*rentalTIme)
+		if (time > 3.0 && time <= 6.0) {
+			if (bound == "lower") {
+				return 6.1;
+			} else {
+				return 9.0;
+			}
+		}else if (time > 6.0 && time <= 9.0) {
+			if (bound == "lower") {
+				return 6.1;
+			} else {
+				return 9.0;
+			}
+		} else if (time > 9.0 && time <= 12.0) {
+			if (bound == "lower") {
+				return 9.1;
+			} else {
+				return 12.0;
+			}
+		} else if (time > 12.0 && time <= 15.0) {
+			if (bound == "lower") {
+				return 12.1;
+			} else {
+				return 15.0;
+			}
+		} else if (time > 15.0 && time <= 18.0) {
+			if (bound == "lower") {
+				return 15.1;
+			} else {
+				return 18.0;
+			}
+		} else if (time > 18.0 && time <= 21.0) {
+			if (bound == "lower") {
+				return 18.1;
+			} else {
+				return 21.0;
+			}
+		}else if (time > 21.0 && time <= 24.0) {
+			if (bound == "lower") {
+				return 21.1;
+			} else {
+				return 24.0;
+			}
+		} else {
+			if (bound == "lower") {
+				return 0.1;
+			} else {
+				return 3.0;
+			}
+		}
+	}
 
-		//log.warn("^^^^^^^^^^> VOT " + evaVot);
-		//log.warn("==========> WALK " + evaWalk);
-		//log.warn("==========> TRAV " + evaTrav);
-		//log.warn("==========> DIST + TRAV " + distTrav);
-
+	//gets the timeSlot cost 
+	public double getTimeSlotCost(double time) {
+		if ((time > 18 && time <= 21) || (time > 12 && time <= 15) || (time > 6 && time <= 9)) {
+			return priceHighRateHorizontal;
+		} else {
+			return priceLowRateHorizontal;
+		}
 	}
 
 }
 
 /*
-public class CostCalculationExample_new implements CostCalculation {
-
-	private final static double betaTT = 1.0;
-	private final static double betaRentalTIme = 1.0;
-	private final static double scaleTOMatchCar = 4.0;
-
-	@Override
-	public double getCost(RentalInfo rentalInfo) {
-
-		double rentalTIme = rentalInfo.getEndTime() - rentalInfo.getStartTime();
-		double inVehicleTime = rentalInfo.getInVehicleTime();
-
-
-		return CostCalculationExample_new.scaleTOMatchCar *
-				(inVehicleTime /60.0 * 0.3 + (rentalTIme - inVehicleTime) / 60.0 * 0.15);
-	}
-
-}
-
-*/
-
+ * public class CostCalculationExample_new implements CostCalculation {
+ * 
+ * private final static double betaTT = 1.0; private final static double
+ * betaRentalTIme = 1.0; private final static double scaleTOMatchCar = 4.0;
+ * 
+ * @Override public double getCost(RentalInfo rentalInfo) {
+ * 
+ * double rentalTIme = rentalInfo.getEndTime() - rentalInfo.getStartTime();
+ * double inVehicleTime = rentalInfo.getInVehicleTime();
+ * 
+ * 
+ * return CostCalculationExample_new.scaleTOMatchCar * (inVehicleTime /60.0 *
+ * 0.3 + (rentalTIme - inVehicleTime) / 60.0 * 0.15); }
+ * 
+ * }
+ * 
+ */
