@@ -110,17 +110,18 @@ public class CostCalculationExample implements CostCalculation {
 			double inVehicleTime = rentalInfo.getInVehicleTime();
 			double distance = rentalInfo.getDistance();
 
-			double evalTime = (priceBaseDriving * (rentalTime / 60)) + ((rentalTime - inVehicleTime) / 60.0 * priceBaseStop);
+			double evalTime = (priceBaseDriving * (inVehicleTime / 60)) + (((rentalTime - inVehicleTime) / 60.0) * priceBaseStop);
 
 			double evalDist = distCost * (distance / 1000);
 
 			costLu = Double.valueOf(df.format(scaleTOMatchCar * (evalTime + evalDist)));
+
 		}
 
 		System.out.println("---------------------------> Cost "+costLu);
 		//rentalInfo.setTripCost(costLu);
 		//System.out.println(rentalInfo.toString());
-		return costLu/100;
+		return costLu;
 
 	}
 
