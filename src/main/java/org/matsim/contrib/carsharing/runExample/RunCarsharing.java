@@ -51,13 +51,13 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-
-/** 
+import java.io.StringReader;/**
  * @author balac
  */
 
@@ -70,6 +70,7 @@ public class RunCarsharing {
 	private static String CONFIG_XML_FILE = null;
 	private static String CONFIG_EXAMOTIVE_FILE = null;
 	private static String URL_INFLUX_DB = null;
+	private static String ENABLE_DISABLE_INFLUX_CONN = null;
 
 
 
@@ -90,10 +91,11 @@ public class RunCarsharing {
         int numberOfThreads = Integer.parseInt(config.getModule("global").getValue("numberOfThreads"));
         Logger.getLogger("org.matsim.core.controler" ).info("Number of Thread for replanning");
 
+
 		CarsharingUtils.addConfigModules(config);
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
-		
+
 		//--------------------------- Parse income & vot -----------------------
 		parseCustomeAttr(PATH + config.plans().getInputFile(), sc);
 
@@ -112,7 +114,7 @@ public class RunCarsharing {
 			File fXmlFile = new File(FileName);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			
+
 			//for skipping population_v6.dtd
 			dBuilder.setEntityResolver(new EntityResolver() {
 		        @Override
@@ -151,13 +153,13 @@ public class RunCarsharing {
 					String id = eElement.getAttribute("id");
 					String personIncome = eElement.getAttribute("income");
 					String personVot = eElement.getAttribute("vot");
-					
+
 					Id<Person> personId = Id.create(id, Person.class);
-					
+
 					Integer income = new Integer(personIncome);
 					Double vot = new Double(personVot);
 
-		
+
 					Person person = sc.getPopulation().getPersons().get(personId);
 					if (income >= 0) {
 						person.getAttributes().putAttribute("income", income);
@@ -166,7 +168,7 @@ public class RunCarsharing {
 						person.getAttributes().putAttribute("income", -1);
 						System.err.println("Income is not a positive number.");
 					}
-					
+
 					if (vot >= 0) {
 						person.getAttributes().putAttribute("vot", vot);
 						//System.out.println("--------------- id: "+person.getId()+",  vot: "+person.getAttributes().getAttribute("vot"));
@@ -174,7 +176,7 @@ public class RunCarsharing {
 						person.getAttributes().putAttribute("vot", -1.0);
 						System.err.println("Income is not a positive number.");
 					}
-					
+
 				}
 			}
 		} catch (Exception e) {
@@ -189,8 +191,9 @@ public class RunCarsharing {
 		CONFIG_XML_FILE = args[1];
 		CONFIG_EXAMOTIVE_FILE = args[2];
 		URL_INFLUX_DB = args[3];
+		ENABLE_DISABLE_INFLUX_CONN = args[4];
 
-		log.info("Scenarios path: " + PATH + " Config file name : " + CONFIG_XML_FILE + " Examotive file: " + CONFIG_EXAMOTIVE_FILE + " InfluxDb URL: " + URL_INFLUX_DB);
+		log.info("Scenarios path: " + PATH + " Config file name : " + CONFIG_XML_FILE + " Examotive file: " + CONFIG_EXAMOTIVE_FILE + " InfluxDb URL: " + URL_INFLUX_DB + " Flux connection value: " + ENABLE_DISABLE_INFLUX_CONN);
 	}
 
 	public static void installCarSharing(final Controler controler) throws IOException {
@@ -271,7 +274,7 @@ public class RunCarsharing {
 		});
 
 		controler.addOverridingModule(new SimulationTimeModule(controler));
-		controler.addOverridingModule(new InfluxModule(URL_INFLUX_DB));
+		controler.addOverridingModule(new InfluxModule(URL_INFLUX_DB, InfluxCommand.ENABLE_INFLUX_CONNECTION.toString().equalsIgnoreCase(ENABLE_DISABLE_INFLUX_CONN)));
 
 		//=== carsharing specific replanning strategies ===
 		
@@ -310,4 +313,8 @@ public class RunCarsharing {
 		controler.addOverridingModule(CarsharingUtils.createRoutingModule());			
 	}
 
+	private enum InfluxCommand{
+		ENABLE_INFLUX_CONNECTION,
+		DISABLE_INFLUX_CONNECTION
+	}
 }
