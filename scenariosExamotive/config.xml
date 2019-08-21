@@ -12,9 +12,10 @@
 	<module name="controler" >
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="outputDirectory" value="&OUTBASE;" />
-		<param name="eventsFileFormat" value="influx" />
-		<param name="legHistogramFormat" value="influx" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="legHistogramFormat" value="txt" />
 		<param name="writePlansInterval" value="1" />
 		<param name="writeEventsInterval" value="1" />
 
@@ -101,6 +102,23 @@
 	<module name="network" >
 		<param name="inputNetworkFile" value="network.xml" />
 	</module>
+<!-- ====================================================================== -->
+
+	<module name="parallelEventHandling" >
+
+		<!-- Estimated number of events during mobsim run. An optional optimization hint for the framework. -->
+		<param name="estimatedNumberOfEvents" value="null" />
+
+		<!-- Number of threads for parallel events handler. 0 or null means the framework decides by itself. -->
+		<param name="numberOfThreads" value="1" />
+
+		<!-- If enabled, each event handler is assigned to its own thread. Note that enabling this feature disabled the numberOfThreads option! This feature is still experimental! -->
+		<param name="oneThreadPerHandler" value="false" />
+
+		<!-- If enabled, it is ensured that all events that are created during a time step of the mobility simulation are processed before the next time step is simulated. E.g. neccessary when within-day replanning is used. -->
+		<param name="synchronizeOnSimSteps" value="true" />
+	</module>
+
 
 <!-- ====================================================================== -->
 
