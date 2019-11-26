@@ -2,6 +2,8 @@ package org.matsim.contrib.carsharing.scoring;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.js.JavaScriptCalculator;
+import org.matsim.contrib.carsharing.manager.PropertyManager;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
@@ -23,14 +25,20 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 	private final DemandHandler demandHandler;
 	private final CostsCalculatorContainer costsCalculatorContainer;
 	private final CarsharingSupplyInterface carsharingSupplyContainer;
+	private final PropertyManager propertyManager;
+	private final JavaScriptCalculator javaScriptCalculator;
+
 	@Inject
 	CarsharingScoringFunctionFactory( final Scenario sc, final DemandHandler demandHandler,
-			final CostsCalculatorContainer costsCalculatorContainer, final CarsharingSupplyInterface carsharingSupplyContainer) {
+			final CostsCalculatorContainer costsCalculatorContainer, final CarsharingSupplyInterface carsharingSupplyContainer,
+									  final PropertyManager propertyManager, final JavaScriptCalculator javaScriptCalculator) {
 		this.scenario = sc;
 		this.params = new SubpopulationScoringParameters( sc );
 		this.demandHandler = demandHandler;
 		this.costsCalculatorContainer = costsCalculatorContainer;
 		this.carsharingSupplyContainer = carsharingSupplyContainer;
+		this.propertyManager = propertyManager;
+		this.javaScriptCalculator = javaScriptCalculator;
 	}
 
 
@@ -43,7 +51,8 @@ public class CarsharingScoringFunctionFactory implements ScoringFunctionFactory 
 	    new CarsharingLegScoringFunction( params.getScoringParameters( person ),
 	    								 this.scenario.getConfig(),
 	    								 this.scenario.getNetwork(), this.demandHandler, this.costsCalculatorContainer, 
-	    								 this.carsharingSupplyContainer, person));
+	    								 this.carsharingSupplyContainer, person,
+										 this.propertyManager, this.javaScriptCalculator));
 		scoringFunctionSum.addScoringFunction(
 				new CharyparNagelLegScoring(
 						params.getScoringParameters( person ),

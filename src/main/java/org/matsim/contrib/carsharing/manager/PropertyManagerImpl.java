@@ -3,7 +3,6 @@ package org.matsim.contrib.carsharing.manager;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.carsharing.runExample.RunCarsharing;
 
 import java.io.FileInputStream;
 import java.io.IOException;

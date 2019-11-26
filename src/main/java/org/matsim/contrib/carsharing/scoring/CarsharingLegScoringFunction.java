@@ -1,13 +1,11 @@
 package org.matsim.contrib.carsharing.scoring;
 
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.js.JavaScriptCalculator;
+import org.matsim.contrib.carsharing.manager.PropertyManager;
 import org.matsim.contrib.carsharing.manager.demand.AgentRentals;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
 import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
@@ -22,7 +20,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.functions.ScoringParameters;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Properties;
 
 
 public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
@@ -34,13 +32,9 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	private DemandHandler demandHandler;
 	private Person person;
 	private CarsharingSupplyInterface carsharingSupplyContainer;
-	/*
-	private static final  Set<String> walkingLegs = ImmutableSet.of("egress_walk_ow", "access_walk_ow",
-			"egress_walk_tw", "access_walk_tw", "egress_walk_ff", "access_walk_ff");
-	
-	private static final  Set<String> carsharingLegs = ImmutableSet.of("oneway_vehicle", "twoway_vehicle",
-			"freefloating_vehicle");*/
-	
+	private PropertyManager propertyManager;
+	private JavaScriptCalculator javaScriptCalculator;
+
 	public CarsharingLegScoringFunction(ScoringParameters params, 
 			Config config,  Network network, DemandHandler demandHandler,
 			CostsCalculatorContainer costsCalculatorContainer, CarsharingSupplyInterface carsharingSupplyContainer,
@@ -52,6 +46,24 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		this.carsharingSupplyContainer = carsharingSupplyContainer;
 		this.costsCalculatorContainer = costsCalculatorContainer;
 		this.person = person;		
+	}
+
+	public CarsharingLegScoringFunction(ScoringParameters params,
+										Config config,  Network network, DemandHandler demandHandler,
+										CostsCalculatorContainer costsCalculatorContainer, CarsharingSupplyInterface carsharingSupplyContainer,
+										Person person,
+										PropertyManager propertyManager,
+										JavaScriptCalculator javaScriptCalculator)
+	{
+		super(params, network);
+		this.config = config;
+		this.demandHandler = demandHandler;
+		this.carsharingSupplyContainer = carsharingSupplyContainer;
+		this.costsCalculatorContainer = costsCalculatorContainer;
+		this.person = person;
+		this.propertyManager = propertyManager;
+		this.javaScriptCalculator = javaScriptCalculator;
+
 	}
 
 	@Override
@@ -112,18 +124,15 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 				
 				String pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
 				
-				double cost = this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), 
-						rentalInfo.getCarsharingType(), rentalInfo);
+				double cost = this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), rentalInfo.getCarsharingType(), rentalInfo, propertyManager, javaScriptCalculator);
 				
 				if(pricing.equals("vertical") || (pricing.equals("horizontal") && activateAvailCars)) {
-					if(availCars > 0)
-						cost = cost/availCars;
-					else
-						cost = 99999999999999999999.0;				
+					Properties properties = propertyManager.getAppExaProperties();
+					String script = properties.getProperty("jsFunc.availability.name");
+					cost = (double) javaScriptCalculator.calculate(script, cost, availCars);
 				}
-				System.out.println("---------------------------> Leg score Cost "+cost);
 				rentalInfo.setTripCost(cost);
-				System.out.println(rentalInfo.toString());
+
 
 				if (marginalUtilityOfMoney != 0.0) {
 					//adds the cost per time and distance over number of available cars
@@ -144,12 +153,5 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		return tmpScore;
 	}
 
-	/*private double getWalkScore(double distance, double travelTime)
-	{
-		double score = 0.0D;
 
-		score += travelTime * this.params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m * distance;
-
-		return score;
-	}*/
 }

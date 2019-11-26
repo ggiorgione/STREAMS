@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
 import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandler;
+import org.matsim.contrib.carsharing.js.JavaScriptCalculator;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
 import org.matsim.contrib.carsharing.manager.PropertyManager;
@@ -244,6 +245,7 @@ public class RunCarsharing {
 				bind(CurrentTotalDemand.class).toInstance(currentTotalDemand);
 				bind(RouteCarsharingTrip.class).toInstance(routeCarsharingTrip);
 				bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
+
 				bind(MembershipContainer.class).toInstance(memberships);
 			    bind(CarsharingSupplyInterface.class).to(CarsharingSupplyContainer.class);
 			    bind(CarsharingManagerInterface.class).to(CarsharingManagerNew.class);
@@ -252,6 +254,7 @@ public class RunCarsharing {
 				bind(PropertyManager.class).to(PropertyManagerImpl.class);
 				bind(RestClientImpl.class).asEagerSingleton();
 				bind(KeycloakTokenManager.class).asEagerSingleton();
+				bind(JavaScriptCalculator.class).asEagerSingleton();
 
 				bind(HttpInvoker.class).toInstance(httpInvoker);
 				bind(RestService.class).toInstance(restService);

@@ -10,6 +10,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.js.JavaScriptCalculator;
+import org.matsim.contrib.carsharing.manager.PropertyManager;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
@@ -33,6 +35,8 @@ public class VehicleChoiceAgentImpl implements VehicleChoiceAgent {
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory ;	
 	@Inject private Map<String, TravelTime> travelTimes ;
 	@Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories ;
+	@Inject private PropertyManager propertyManager;
+	@Inject private JavaScriptCalculator javaScriptCalculator;
 	public static final Logger log = Logger.getLogger(VehicleChoiceAgentImpl.class);
 	
 	@Override
@@ -81,7 +85,7 @@ public class VehicleChoiceAgentImpl implements VehicleChoiceAgent {
 				else
 					rentalInfo.setEndTime(currentTime + walkTravelTime + time);
 				
-				double utility = -costCalculator.getCost(vehicle.getCompanyId(), vehicle.getCsType(), rentalInfo) * marginalUtilityOfMoney;
+				double utility = -costCalculator.getCost(vehicle.getCompanyId(), vehicle.getCsType(), rentalInfo, propertyManager, javaScriptCalculator) * marginalUtilityOfMoney;
 				
 				if (utility > maxUtility) {
 					maxUtility = utility;
