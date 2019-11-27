@@ -47,7 +47,7 @@ function timeBasePrice(rentalInfo){
 
     var startRentTimeMin = rentalInfo.getStartTime()/minConst;
     var endRentTimeMin = rentalInfo.getEndTime()/minConst;
-    var adjEndRentTimeMin = adjustEndRentTime(endRentTimeMin, flexGracePeriodMin);
+    var adjEndRentTimeMin = adjustEndRentTimeOplyPolicy(endRentTimeMin, flexGracePeriodMin);
     var totalPrice = 0.0;
 
     for(var i = Math.floor(startRentTimeMin); i < Math.floor(adjEndRentTimeMin); i++){
@@ -64,7 +64,7 @@ function timeBasePrice(rentalInfo){
  * @param gracePeriod
  * @returns {*}
  */
-function adjustEndRentTime(endRentTime, gracePeriod){
+function adjustEndRentTimeOplyPolicy(endRentTime, gracePeriod){
     var addMinute = endRentTime%minConst;
     if(addMinute > gracePeriod){
         var effectiveHours = parseInt(endRentTime/minConst);
