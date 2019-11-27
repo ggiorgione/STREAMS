@@ -4,14 +4,12 @@ public class Prices {
 
     private String pricing;
 
-    private double priceBaseDriving, priceBaseStop, priceHighRateHorizontal, priceLowRateHorizontal;
+    private double priceBaseDriving, priceBaseStop;
 
-    public Prices(String pricing, double priceBaseDriving, double priceBaseStop, double priceHighRateHorizontal, double priceLowRateHorizontal) {
+    public Prices(String pricing, double priceBaseDriving, double priceBaseStop) {
         this.pricing = pricing;
         this.priceBaseDriving = priceBaseDriving;
         this.priceBaseStop = priceBaseStop;
-        this.priceHighRateHorizontal = priceHighRateHorizontal;
-        this.priceLowRateHorizontal = priceLowRateHorizontal;
     }
 
     public String getPricing() {
@@ -38,21 +36,6 @@ public class Prices {
         this.priceBaseStop = priceBaseStop;
     }
 
-    public double getPriceHighRateHorizontal() {
-        return priceHighRateHorizontal;
-    }
-
-    public void setPriceHighRateHorizontal(double priceHighRateHorizontal) {
-        this.priceHighRateHorizontal = priceHighRateHorizontal;
-    }
-
-    public double getPriceLowRateHorizontal() {
-        return priceLowRateHorizontal;
-    }
-
-    public void setPriceLowRateHorizontal(double priceLowRateHorizontal) {
-        this.priceLowRateHorizontal = priceLowRateHorizontal;
-    }
 }
 
 

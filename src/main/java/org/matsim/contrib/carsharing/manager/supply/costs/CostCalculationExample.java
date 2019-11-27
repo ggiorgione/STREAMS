@@ -17,8 +17,7 @@ public class CostCalculationExample implements CostCalculation {
 	private double priceBaseStop;
 	private Config config;
 	private String pricing;
-	private double priceHighRateHorizontal;
-	private double priceLowRateHorizontal;
+
 
 
 	public CostCalculationExample(Config config) {
@@ -28,8 +27,6 @@ public class CostCalculationExample implements CostCalculation {
 		pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
 		priceBaseDriving = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceBaseDriving"));
 		priceBaseStop = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceBaseStop"));
-		priceHighRateHorizontal = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceHighRateHorizontal"));
-		priceLowRateHorizontal = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceLowRateHorizontal"));
 	}
 
 
@@ -37,7 +34,7 @@ public class CostCalculationExample implements CostCalculation {
 	public double getCost(RentalInfo rentalInfo, PropertyManager propertyManager, JavaScriptCalculator javaScriptCalculator) {
 		Properties properties = propertyManager.getAppExaProperties();
 		String script = properties.getProperty("jsFunc.price.name");
-		Prices prices = new Prices(pricing, priceBaseDriving, priceBaseStop, priceHighRateHorizontal, priceLowRateHorizontal);
+		Prices prices = new Prices(pricing, priceBaseDriving, priceBaseStop);
 		return (double) javaScriptCalculator.calculate(script, rentalInfo, prices);
 
 	}

@@ -12,6 +12,7 @@ import org.matsim.contrib.carsharing.manager.demand.RentalInfo;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.TwoWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.costs.CostsCalculatorContainer;
+import org.matsim.contrib.carsharing.runExample.PriceType;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
@@ -126,7 +127,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 				
 				double cost = this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), rentalInfo.getCarsharingType(), rentalInfo, propertyManager, javaScriptCalculator);
 				
-				if(pricing.equals("vertical") || (pricing.equals("horizontal") && activateAvailCars)) {
+				if(pricing.equals(PriceType.AVAIL_BASE.getPriceType()) || (pricing.equals(PriceType.TIME_BASE.getPriceType()) && activateAvailCars)) {
 					Properties properties = propertyManager.getAppExaProperties();
 					String script = properties.getProperty("jsFunc.availability.name");
 					cost = (double) javaScriptCalculator.calculate(script, cost, availCars);

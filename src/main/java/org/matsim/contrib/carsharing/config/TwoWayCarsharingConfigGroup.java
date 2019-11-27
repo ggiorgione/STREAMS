@@ -35,10 +35,6 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	private Double priceBaseDriving = null;
 
 	private Double priceBaseStop = null;
-	
-	private Double priceHighRateHorizontal = null;
-	
-	private Double priceLowRateHorizontal = null;
 
 
 	public TwoWayCarsharingConfigGroup() {
@@ -183,26 +179,7 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 		this.priceBaseStop = priceBaseStop;
 	}
 
-	@StringGetter( "priceHighRateHorizontal" )
-	public Double getPriceHighRateHorizontal() {
-		return priceHighRateHorizontal;
-	}
-	
-	@StringSetter( "priceHighRateHorizontal" )
-	public void setPriceHighRateHorizontal(Double priceHighRateHorizontal) {
-		this.priceHighRateHorizontal = priceHighRateHorizontal;
-	}
 
-	@StringGetter( "priceLowRateHorizontal" )
-	public Double getPriceLowRateHorizontal() {
-		return priceLowRateHorizontal;
-	}
-
-	@StringSetter( "priceLowRateHorizontal" )
-	public void setPriceLowRateHorizontal(Double priceLowRateHorizontal) {
-		this.priceLowRateHorizontal = priceLowRateHorizontal;
-	}
-	
 
 }
 
