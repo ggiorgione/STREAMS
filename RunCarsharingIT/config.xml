@@ -15,6 +15,7 @@
 		<param name="eventsFileFormat" value="xml" />
 		<param name="writePlansInterval" value="10" />
 		<param name="writeEventsInterval" value="10" />-->
+   		 <param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="outputDirectory" value="&OUTBASE;" />
 		<param name="eventsFileFormat" value="xml" />
 		<!--< param name="legHistogramFormat" value="influx" /> -->
@@ -29,11 +30,11 @@
 <!-- ====================================================================== -->
 
 		<module name="qsim">
-			<param name="endTime" value="00:00:00"   />
+			<param name="endTime" value="30:00:00"   />
 			<param name="flowCapacityFactor" value="0.1"   />
 			<param name="storageCapacityFactor" value="10"   />
 			<param name="mainMode" value="car,twoway_vehicle"   />
-			<param name="numberOfThreads" value="7" />
+			<param name="numberOfThreads" value="4" />
 		</module>
 
     <module name="Carsharing" >
@@ -52,12 +53,10 @@
         <param name="searchDistanceTwoWayCarsharing" value="1000.0" />
         <param name="votTwoWayCarsharing" value="1.0"/>
         <param name="activateVot" value="false"/> <!-- "true" activates VOT as part of scoring and "false" disables it -->
-        <param name="activateAvailCars" value="false"/> <!-- "true" activates Available cars as part of cost and "false" disables it -->
-		<param name="pricing" value="base" /><!-- Default:base; it can also take a value of "vertical" or "horizontal"; Defines the pricing type. -->
-		<param name="priceBaseDriving" value="0.3"/> <!-- Driving price used for both vertical and base pricing types -->
-		<param name="priceBaseStop" value="0.3"/> <!-- Stop price used for both vertical and base pricing types -->
-		<param name="priceHighRateHorizontal" value="0.45"/> <!-- High rate price used for Horizontal pricing type -->
-		<param name="priceLowRateHorizontal" value="0.2"/> <!-- Low rate price used for Horizontal pricing type -->
+        <param name="activateAvailCars" value="true"/> <!-- "true" activates Available cars as part of cost and "false" disables it -->
+		<param name="pricing" value="timeBase" /><!-- Default:fixed; it can also take a value of "availabilityBase" or "timeBase"; Defines the pricing type. -->
+		<param name="priceBaseDriving" value="0.6"/> <!-- Driving price used for both availabilityBase and fixed pricing types -->
+		<param name="priceBaseStop" value="0.6"/> <!-- Stop price used for both availabilityBase and fixed pricing types -->
 	</module>
 
 <!-- ====================================================================== -->
@@ -93,7 +92,7 @@
 	<module name="global" >
 		<param name="coordinateSystem" value="Atlantis" /> <!-- Atlantis, CH1903_LV03 -->
 		<param name="randomSeed" value="4711" />
-		<param name="numberOfThreads" value="8" />
+		<param name="numberOfThreads" value="4" />
 	</module>
 
 <!-- ====================================================================== -->
