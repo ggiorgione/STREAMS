@@ -27,11 +27,12 @@ function computePrice(rentalInfo, prices){
 function fixedPrice(rentalInfo, prices){
     var startRentTime = rentalInfo.getStartTime();
     var endRentTime = rentalInfo.getEndTime();
+    var adjEndRentTimeSec = adjustEndRentTimeOplyPolicy(endRentTime/minConst, flexGracePeriodMin)*minConst;
     var priceBaseDriving = prices.getPriceBaseDriving();
     var priceBaseStop = prices.getPriceBaseStop();
 
 
-    var rentalTime = endRentTime - startRentTime;
+    var rentalTime = adjEndRentTimeSec - startRentTime;
     var inVehicleTime = rentalInfo.getInVehicleTime();
     var distance = rentalInfo.getDistance();
 
