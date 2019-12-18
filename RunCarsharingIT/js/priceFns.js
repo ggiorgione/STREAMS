@@ -27,16 +27,16 @@ function computePrice(rentalInfo, prices){
 function fixedPrice(rentalInfo, prices){
     var startRentTime = rentalInfo.getStartTime();
     var endRentTime = rentalInfo.getEndTime();
-    var adjEndRentTimeSec = adjustEndRentTimeOplyPolicy(endRentTime/minConst, flexGracePeriodMin)*minConst;
     var priceBaseDriving = prices.getPriceBaseDriving();
     var priceBaseStop = prices.getPriceBaseStop();
 
 
-    var rentalTime = adjEndRentTimeSec - startRentTime;
+    var rentalTime = endRentTime - startRentTime;
+    var adjRentalTimeSec = adjustEndRentTimeOplyPolicy(rentalTime/minConst, flexGracePeriodMin)*minConst;
     var inVehicleTime = rentalInfo.getInVehicleTime();
     var distance = rentalInfo.getDistance();
 
-    var evalTime = (priceBaseDriving * (inVehicleTime / minConst)) + (((rentalTime - inVehicleTime) / minConst) * priceBaseStop);
+    var evalTime = (priceBaseDriving * (inVehicleTime / minConst)) + (((adjRentalTimeSec - inVehicleTime) / minConst) * priceBaseStop);
 
     var evalDist = distCost * (distance / 1000);
     var costNum = scaleToMatchCar * (evalTime + evalDist);
