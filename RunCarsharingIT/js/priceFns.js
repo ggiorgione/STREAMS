@@ -48,10 +48,14 @@ function timeBasePrice(rentalInfo){
 
     var startRentTimeMin = rentalInfo.getStartTime()/minConst;
     var endRentTimeMin = rentalInfo.getEndTime()/minConst;
-    var adjEndRentTimeMin = adjustEndRentTimeOplyPolicy(endRentTimeMin, flexGracePeriodMin);
+    var rentalTimeMin = endRentTimeMin - startRentTimeMin;
+
+    var adjRentalTimeMin = adjustEndRentTimeOplyPolicy(rentalTimeMin, flexGracePeriodMin);
+    var adjUpperBoundRentalTimeMin = startRentTimeMin + adjRentalTimeMin;
+
     var totalPrice = 0.0;
 
-    for(var i = Math.floor(startRentTimeMin); i < Math.floor(adjEndRentTimeMin); i++){
+    for(var i = Math.floor(startRentTimeMin); i < Math.floor(adjUpperBoundRentalTimeMin); i++){
         totalPrice = totalPrice + ((i<=timeBasePriceFnMaxIdx) ? timeBasePriceFn[i] : timeBasePriceFn[timeBasePriceFnMaxIdx]);
     }
 
