@@ -40,10 +40,8 @@ function fixedPrice(rentalInfo, prices){
 
     var evalDist = distCost * (distance / 1000);
     var costNum = scaleToMatchCar * (evalTime + evalDist);
-    var result = parseFloat(costNum.toFixed(2))
-    print("=========> " + result)
+    return parseFloat(costNum.toFixed(2))
 
-    return result
 }
 
 
