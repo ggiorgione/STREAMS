@@ -36,6 +36,8 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 
 	private Double priceBaseStop = null;
 
+	private boolean enableOplyPricePolicy;
+
 
 	public TwoWayCarsharingConfigGroup() {
 		super(GROUP_NAME);
@@ -179,7 +181,14 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 		this.priceBaseStop = priceBaseStop;
 	}
 
+	@StringGetter( "enableOplyPricePolicy" )
+	public boolean enableOplyPricePolicy() {
+		return this.enableOplyPricePolicy;
+	}
 
-
+	@StringSetter( "enableOplyPricePolicy" )
+	public void setEnableOplyPricePolicy(boolean enableOplyPricePolicy) {
+		this.enableOplyPricePolicy = enableOplyPricePolicy;
+	}
 }
 

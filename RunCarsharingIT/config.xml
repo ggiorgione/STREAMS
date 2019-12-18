@@ -57,6 +57,7 @@
 		<param name="pricing" value="timeBase" /><!-- Default:fixed; it can also take a value of "availabilityBase" or "timeBase"; Defines the pricing type. -->
 		<param name="priceBaseDriving" value="0.6"/> <!-- Driving price used for both availabilityBase and fixed pricing types -->
 		<param name="priceBaseStop" value="0.6"/> <!-- Stop price used for both availabilityBase and fixed pricing types -->
+		<param name="enableOplyPricePolicy" value="true"/> <!-- "true" activates Oply policy prices as part of cost and "false" disables it -->
 	</module>
 
 <!-- ====================================================================== -->

@@ -6,10 +6,13 @@ public class Prices {
 
     private double priceBaseDriving, priceBaseStop;
 
-    public Prices(String pricing, double priceBaseDriving, double priceBaseStop) {
+    private boolean enableOplyPricePolicy;
+
+    public Prices(String pricing, double priceBaseDriving, double priceBaseStop, boolean enableOplyPricePolicy) {
         this.pricing = pricing;
         this.priceBaseDriving = priceBaseDriving;
         this.priceBaseStop = priceBaseStop;
+        this.enableOplyPricePolicy = enableOplyPricePolicy;
     }
 
     public String getPricing() {
@@ -36,6 +39,13 @@ public class Prices {
         this.priceBaseStop = priceBaseStop;
     }
 
+    public boolean isEnableOplyPricePolicy() {
+        return enableOplyPricePolicy;
+    }
+
+    public void setEnableOplyPricePolicy(boolean enableOplyPricePolicy) {
+        this.enableOplyPricePolicy = enableOplyPricePolicy;
+    }
 }
 
 

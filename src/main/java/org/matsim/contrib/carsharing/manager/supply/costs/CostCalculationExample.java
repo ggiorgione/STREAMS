@@ -15,8 +15,10 @@ public class CostCalculationExample implements CostCalculation {
 
 	private double priceBaseDriving;
 	private double priceBaseStop;
+	private boolean enableOplyPricePolicy;
 	private Config config;
 	private String pricing;
+
 
 
 
@@ -27,6 +29,7 @@ public class CostCalculationExample implements CostCalculation {
 		pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
 		priceBaseDriving = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceBaseDriving"));
 		priceBaseStop = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("priceBaseStop"));
+		enableOplyPricePolicy = Boolean.valueOf(this.config.getModules().get("TwoWayCarsharing").getParams().get("enableOplyPricePolicy"));
 	}
 
 
@@ -34,7 +37,7 @@ public class CostCalculationExample implements CostCalculation {
 	public double getCost(RentalInfo rentalInfo, PropertyManager propertyManager, JavaScriptCalculator javaScriptCalculator) {
 		Properties properties = propertyManager.getAppExaProperties();
 		String script = properties.getProperty("jsFunc.price.name");
-		Prices prices = new Prices(pricing, priceBaseDriving, priceBaseStop);
+		Prices prices = new Prices(pricing, priceBaseDriving, priceBaseStop, enableOplyPricePolicy);
 		return (double) javaScriptCalculator.calculate(script, rentalInfo, prices);
 
 	}

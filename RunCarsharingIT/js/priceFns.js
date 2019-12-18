@@ -20,7 +20,7 @@ var timeBasePriceFnMaxIdx = timeBasePriceFn.length-1;
 
 function computePrice(rentalInfo, prices){
     return prices.getPricing() === priceType.TIME_BASE.getPriceType()
-          ? timeBasePrice(rentalInfo)
+          ? timeBasePrice(rentalInfo, prices)
           : fixedPrice(rentalInfo, prices)
 }
 
@@ -29,10 +29,15 @@ function fixedPrice(rentalInfo, prices){
     var endRentTime = rentalInfo.getEndTime();
     var priceBaseDriving = prices.getPriceBaseDriving();
     var priceBaseStop = prices.getPriceBaseStop();
+    var enableOplyPricePolicy = prices.isEnableOplyPricePolicy();
 
 
     var rentalTime = endRentTime - startRentTime;
-    var adjRentalTimeSec = adjustEndRentTimeOplyPolicy(rentalTime/minConst, flexGracePeriodMin)*minConst;
+
+    var adjRentalTimeSec = enableOplyPricePolicy
+        ? adjustEndRentTimeOplyPolicy(rentalTime/minConst, flexGracePeriodMin)*minConst
+        : rentalTime;
+
     var inVehicleTime = rentalInfo.getInVehicleTime();
     var distance = rentalInfo.getDistance();
 
@@ -45,13 +50,17 @@ function fixedPrice(rentalInfo, prices){
 }
 
 
-function timeBasePrice(rentalInfo){
+function timeBasePrice(rentalInfo, prices){
 
     var startRentTimeMin = rentalInfo.getStartTime()/minConst;
     var endRentTimeMin = rentalInfo.getEndTime()/minConst;
     var rentalTimeMin = endRentTimeMin - startRentTimeMin;
+    var enableOplyPricePolicy = prices.isEnableOplyPricePolicy();
 
-    var adjRentalTimeMin = adjustEndRentTimeOplyPolicy(rentalTimeMin, flexGracePeriodMin);
+    var adjRentalTimeMin = enableOplyPricePolicy
+        ? adjustEndRentTimeOplyPolicy(rentalTimeMin, flexGracePeriodMin)
+        : rentalTimeMin;
+
     var adjUpperBoundRentalTimeMin = startRentTimeMin + adjRentalTimeMin;
 
     var totalPrice = 0.0;
