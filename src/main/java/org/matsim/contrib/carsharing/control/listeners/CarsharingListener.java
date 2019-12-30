@@ -86,7 +86,7 @@ public class CarsharingListener implements IterationEndsListener{
 
 		final BufferedWriter outLink = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "CS.txt"));
 		try {
-			outLink.write("personID,carsharingType,startTime,endTIme,startLink,pickupLink,dropoffLink,endLink,distance,inVehicleTime,accessTime,egressTime,vehicleID,bookingTime,companyID,vehicleType");
+			outLink.write("personID,carsharingType,startTime,endTIme,startLink,pickupLink,dropoffLink,endLink,distance,inVehicleTime,accessTime,egressTime,vehicleID,cost,bookingTime,companyID,vehicleType");
 			outLink.newLine();
 
 			for (Id<Person> personId: agentRentalsMap.keySet()) {
