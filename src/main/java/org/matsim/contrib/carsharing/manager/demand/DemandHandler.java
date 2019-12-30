@@ -53,6 +53,8 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 
 	private Map<Id<Person>, BigInteger> personTripIdMap = new HashMap<>();
 
+	private Map<Id<Person>, Integer> availableVehiclesRentalStart = new HashMap<>();
+
 	@Override
 	public void reset(int iteration) {
 		agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();
@@ -71,6 +73,8 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 		personTripIdMap = new HashMap<>();
 
 		restService.clearTrips();
+
+		availableVehiclesRentalStart = new HashMap<>();
 	}
 
 	@Override
@@ -112,10 +116,12 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 		info.setTripTypes(TripTypes.UNPLANNED);
 		info.setPersonId(event.getPersonId());
 
+		availableVehiclesRentalStart.put(event.getPersonId(), event.getAvailableVehiclesNumber());
 
 		if (agentRentalsMap.containsKey(event.getPersonId())) {
 			AgentRentals agentRentals = this.agentRentalsMap.get(event.getPersonId());
 			agentRentals.getStatsPerVehicle().put(event.getvehicleId(), info);
+
 
 		}
 		else {
@@ -203,5 +209,9 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 
 	public Map<Id<Vehicle>, VehicleRentals> getVehicleRentalsMap() {
 		return this.vehicleRentalsMap;
+	}
+
+	public Map<Id<Person>, Integer> getAvailableVehiclesRentalStart() {
+		return availableVehiclesRentalStart;
 	}
 }

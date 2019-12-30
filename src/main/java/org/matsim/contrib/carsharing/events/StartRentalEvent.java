@@ -28,6 +28,8 @@ public class StartRentalEvent extends Event implements HasPersonId{
 
 	private String companyId;
 
+	private Integer availableVehiclesNumber;
+
 	public static final String EVENT_TYPE = "Rental Start";
 
 	public StartRentalEvent(double now, String carsharingType, String companyId,
@@ -41,6 +43,20 @@ public class StartRentalEvent extends Event implements HasPersonId{
 		this.vehicleId = vehId;
 		this.carsharingType = carsharingType;
 		this.companyId = companyId;
+	}
+
+	public StartRentalEvent(double now, String carsharingType, String companyId,
+							Link currentLink, Link stationLink, Link destinationLink, Id<Person> id, String vehId, Integer availableVehiclesNumber) {
+		super(now);
+		this.originlinkId = currentLink.getId();
+		this.pickuplinkId = stationLink.getId();
+		this.destinationLinkId = destinationLink.getId();
+
+		this.personId = id;
+		this.vehicleId = vehId;
+		this.carsharingType = carsharingType;
+		this.companyId = companyId;
+		this.availableVehiclesNumber = availableVehiclesNumber;
 	}
 
 	@Override
@@ -75,7 +91,11 @@ public class StartRentalEvent extends Event implements HasPersonId{
 	public String getCompanyId() {
 		return this.companyId;
 	}
-	
+
+	public Integer getAvailableVehiclesNumber() {
+		return availableVehiclesNumber!= null ? availableVehiclesNumber : 0;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = new LinkedHashMap<String, String>();
@@ -88,6 +108,7 @@ public class StartRentalEvent extends Event implements HasPersonId{
 		attr.put("companyId", companyId);		
 		attr.put("Vehicleid", vehicleId);
 		attr.put("personid", personId.toString());
+		attr.put("availableVehiclesNumber", getAvailableVehiclesNumber().toString());
 
 		return attr;
 	}	

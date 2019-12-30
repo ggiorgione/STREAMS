@@ -120,7 +120,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 						.get(((StationBasedVehicle) vehicle).getStationId());
 
 				//gets the number of available cars in the nearest station
-				availCars = ((TwoWayCarsharingStation) nearestStation).getNumberOfVehicles(vehicle.getType());
+				availCars = this.demandHandler.getAvailableVehiclesRentalStart().get(person.getId());
 				//}
 				
 				String pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
