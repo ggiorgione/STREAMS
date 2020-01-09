@@ -17,6 +17,7 @@ public interface VehiclesContainer {
 	public boolean reserveVehicle(CSVehicle vehicle);
 	public void parkVehicle(CSVehicle vehicle, Link link);
 	public Link getVehicleLocation(CSVehicle vehicle);
+	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance, Consumer<CarsharingStation> fireEvent, Consumer<CarsharingStation> fireAvailableVehiclesNum);
 	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance, Consumer<CarsharingStation> fireEvent);
 	public CSVehicle findClosestAvailableVehicle(EventsManager eventsManager, Double time, Link startLink, String typeOfVehicle, double searchDistance, Id<Person> personId, String carsharingType, Link destinationLink);
 	public Link findClosestAvailableParkingLocation(Link destinationLink, double searchDistance);

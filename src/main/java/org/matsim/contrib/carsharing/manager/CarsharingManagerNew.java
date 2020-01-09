@@ -143,15 +143,14 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 				VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
 				Link stationLink = vehiclesContainer.getVehicleLocation(chosenVehicle);
 				
-				if (false == companyContainer.reserveVehicle(chosenVehicle)) {
+				if (!companyContainer.reserveVehicle(chosenVehicle)) {
 					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, chosenVehicle.getCompanyId(), startLink, destinationLink, person.getId()));
 
 					return null;
 				}
-				//Take off chosen vehicle from available vehicles number otherwise 0
-				int availableVehiclesNumber = offeredVehicles.size()!=0 ? offeredVehicles.size() -1 : 0;
+
 				eventsManager.processEvent(new StartRentalEvent(time, carsharingType,
-						chosenVehicle.getCompanyId(), startLink, stationLink, destinationLink, person.getId(), chosenVehicle.getVehicleId(), availableVehiclesNumber));
+						chosenVehicle.getCompanyId(), startLink, stationLink, destinationLink, person.getId(), chosenVehicle.getVehicleId()));
 			
 				if ((willHaveATripFromLocation && keepTheCar) || (willHaveATripFromLocation && carsharingType.equals("twoway"))) {
 					((CarsharingRoute)legToBeRouted.getRoute()).setKeepthecar(true);

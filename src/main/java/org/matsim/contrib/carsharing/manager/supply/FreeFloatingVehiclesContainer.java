@@ -92,6 +92,12 @@ public class FreeFloatingVehiclesContainer implements VehiclesContainer{
 	}
 
 	@Override
+	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance, Consumer<CarsharingStation> fireEvent, Consumer<CarsharingStation> fireAvailableVehiclesNum) {
+		return null;
+	}
+
+
+	@Override
 	public CSVehicle findClosestAvailableVehicle(EventsManager eventsManager, Double time, Link startLink, String typeOfVehicle, double searchDistance, Id<Person> personId, String carsharingType, Link destinationLink) {
 		return findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance, carsharingStation-> {});
 	}

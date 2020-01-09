@@ -14,8 +14,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.carsharing.entity.Trip;
 import org.matsim.contrib.carsharing.entity.TripTypes;
+import org.matsim.contrib.carsharing.events.AvailableVehiclesNumberEvent;
 import org.matsim.contrib.carsharing.events.EndRentalEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
+import org.matsim.contrib.carsharing.events.handlers.AvailableVehiclesNumberEventHandler;
 import org.matsim.contrib.carsharing.events.handlers.EndRentalEventHandler;
 import org.matsim.contrib.carsharing.events.handlers.StartRentalEventHandler;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
@@ -33,7 +35,7 @@ import static org.matsim.contrib.carsharing.entity.DateUtils.doubleTime2CurrentL
  * @author balac
  */
 public class DemandHandler implements PersonLeavesVehicleEventHandler,
-		PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler, EndRentalEventHandler {
+		PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler, EndRentalEventHandler, AvailableVehiclesNumberEventHandler {
 
 
 	private static final Logger log = Logger.getLogger(DemandHandler.class);
@@ -116,8 +118,6 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 		info.setTripTypes(TripTypes.UNPLANNED);
 		info.setPersonId(event.getPersonId());
 
-		availableVehiclesRentalStart.put(event.getPersonId(), event.getAvailableVehiclesNumber());
-
 		if (agentRentalsMap.containsKey(event.getPersonId())) {
 			AgentRentals agentRentals = this.agentRentalsMap.get(event.getPersonId());
 			agentRentals.getStatsPerVehicle().put(event.getvehicleId(), info);
@@ -198,6 +198,11 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 		}
 	}
 
+	@Override
+	public void handleEvent(AvailableVehiclesNumberEvent event) {
+		availableVehiclesRentalStart.put(event.getPersonId(), event.getAvailableVehiclesNumber());
+	}
+
 	private boolean carsharingTrip(Id<Vehicle> vehicleId) {
 
 		return this.carsharingSupplyContainer.getAllVehicles().containsKey(vehicleId.toString());
@@ -214,4 +219,6 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 	public Map<Id<Person>, Integer> getAvailableVehiclesRentalStart() {
 		return availableVehiclesRentalStart;
 	}
+
+
 }

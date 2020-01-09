@@ -103,25 +103,10 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 					score +=  betaVot * personVoT;
 				}
 
-
-
-				int availCars = 0;
-
 				//Gets the configuration value of available cars disabling/enabling
 				boolean activateAvailCars = Boolean.parseBoolean(this.config.getModules().get("TwoWayCarsharing").getParams().get("activateAvailCars"));
-
-				//Calculates value of available cars if it is not disabled in config.xml
-				//if(activateAvailCars) {
-
-				//get the station of the nearest vehicle to the person
-				CarsharingStation nearestStation = ((TwoWayContainer) this.carsharingSupplyContainer
-						.getCompany(vehicle.getCompanyId()).getVehicleContainer("twoway"))
-						.getTwowaycarsharingstationsMap()
-						.get(((StationBasedVehicle) vehicle).getStationId());
-
 				//gets the number of available cars in the nearest station
-				availCars = this.demandHandler.getAvailableVehiclesRentalStart().get(person.getId());
-				//}
+				int availCars = this.demandHandler.getAvailableVehiclesRentalStart().get(person.getId());
 				
 				String pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
 				

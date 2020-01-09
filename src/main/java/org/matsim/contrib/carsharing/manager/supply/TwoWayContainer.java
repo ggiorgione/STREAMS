@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.events.AvailableVehiclesNumberEvent;
 import org.matsim.contrib.carsharing.events.NoVehicleAtStationCarSharingEvent;
 import org.matsim.contrib.carsharing.stations.CarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
@@ -74,12 +75,13 @@ public class TwoWayContainer implements VehiclesContainer{
 	public CSVehicle findClosestAvailableVehicle(EventsManager eventsManager, Double time, Link startLink, String typeOfVehicle, double searchDistance, Id<Person> personId, String carsharingType, Link destinationLink) {
 
 		Consumer<CarsharingStation> fireEvent = station -> eventsManager.processEvent(new NoVehicleAtStationCarSharingEvent(time, startLink, destinationLink, carsharingType, "", personId, station, typeOfVehicle));
+		Consumer<CarsharingStation> fireAvailableVehiclesNum = station -> eventsManager.processEvent(new AvailableVehiclesNumberEvent(time, startLink, destinationLink, carsharingType, "", personId, station, typeOfVehicle, ((TwoWayCarsharingStation)station).getVehicles(typeOfVehicle).size()));
 
-		return findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance, fireEvent);
+		return findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance, fireEvent, fireAvailableVehiclesNum);
 	}
 
 	@Override
-	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance, Consumer<CarsharingStation> fireEvent) {
+	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance, Consumer<CarsharingStation> fireEvent, Consumer<CarsharingStation> fireAvailableVehiclesNum) {
 			Collection<CarsharingStation> location =
 				this.twvehicleLocationQuadTree.getDisk(startLink.getCoord().getX(), 
 						startLink.getCoord().getY(), searchDistance);
@@ -102,10 +104,16 @@ public class TwoWayContainer implements VehiclesContainer{
 		}
 		
 		if (closest != null) {
+			fireAvailableVehiclesNum.accept(closest);
 			CSVehicle vehicleToBeUsed = ((TwoWayCarsharingStation)closest).getVehicles(typeOfVehicle).get(0);
 			return vehicleToBeUsed;
 		}
 		
+		return null;
+	}
+
+	@Override
+	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance, Consumer<CarsharingStation> fireEvent) {
 		return null;
 	}
 
