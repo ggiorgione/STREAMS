@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -21,6 +22,9 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 	private final List<String> availableModes;
 	private final List<String> availableModesWithoutCar;
 	private MembershipContainer memberships;
+	private List<String> modes = Arrays.asList("car", "pt","walk","bike");
+
+
 	public CarsharingSubTourPermissableModesCalculator(final Scenario scenario, final String[] availableModes, 
 			MembershipContainer memberships) {
 		this.scenario = scenario;
@@ -48,16 +52,15 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException( "I need a PersonImpl to get car availability" );
 		}
-		
-		 if (Boolean.parseBoolean(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
-		
-				 && this.memberships.getPerPersonMemberships().get(personId).getMembershipsPerCSType().containsKey("twoway")) {
-			 
-			 
-			 l.add("twoway");
-			 
-		 }
-		
+		if (Boolean.parseBoolean(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
+				&& this.memberships.getPerPersonMemberships().get(personId)!=null && this.memberships.getPerPersonMemberships().get(personId).getMembershipsPerCSType().containsKey("twoway")) {
+			l.add("twoway");
+
+		}else{
+			int rndElemIdx = ThreadLocalRandom.current().nextInt(modes.size()) % modes.size();
+			l.add(modes.get(rndElemIdx));
+		}
+
 		return l;
 	}
 

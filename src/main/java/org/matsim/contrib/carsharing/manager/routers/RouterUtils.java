@@ -19,8 +19,8 @@ public class RouterUtils {
 	public static Leg createCarLeg(PopulationFactory pf, LeastCostPathCalculator pathCalculator,
 			Person person, Link startLink, Link destinationLink, String mode, 
 			String vehicleId, double now) {
-		
-		
+
+
 		RouteFactories routeFactory = ((PopulationFactory)pf).getRouteFactories() ;
 		
 		Vehicle vehicle = null ;

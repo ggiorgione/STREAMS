@@ -7,13 +7,12 @@ import org.matsim.api.core.v01.population.Person;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class NoVehicleCarSharingEvent extends Event{
 
 	public static final String EVENT_TYPE = "no carsharing vehicle";
 
-	private final Id<Link> originLinkId;
+	private final Link originLink;
 
 	private final Id<Link> destinationLinkId;
 
@@ -25,7 +24,7 @@ public class NoVehicleCarSharingEvent extends Event{
 
 	public NoVehicleCarSharingEvent(double time, String carsharingType, String companyId, Link currentLink, Link destinationLink, Id<Person> personId) {
 		super(time);
-		this.originLinkId = currentLink.getId();
+		this.originLink = currentLink;
 		this.destinationLinkId = destinationLink.getId();
 		this.carsharingType = carsharingType;
 		this.companyId = companyId;
@@ -38,7 +37,7 @@ public class NoVehicleCarSharingEvent extends Event{
 	}
 
 	public Id<Link> getOriginLinkId(){
-		return this.originLinkId;
+		return this.originLink.getId();
 	}
 
 	public Id<Link> getDestinationLinkId(){
@@ -55,9 +54,11 @@ public class NoVehicleCarSharingEvent extends Event{
 
 	@Override
 	public Map<String, String> getAttributes() {
-		Map<String, String> attr = new LinkedHashMap<String, String>();
+		Map<String, String> attr = new LinkedHashMap<String, String>(super.getAttributes());
 		attr.put(ATTRIBUTE_TYPE, getEventType());
-		attr.put("OriginLinkId", originLinkId!=null ? originLinkId.toString() : "");
+		attr.put("NodeCoordX", Double.toString(originLink.getFromNode().getCoord().getX()));
+		attr.put("NodeCoordY", Double.toString(originLink.getFromNode().getCoord().getY()));
+		attr.put("OriginLinkId", originLink.getId() !=null ? originLink.getId().toString() : "");
 		attr.put("DestinationLinkId", destinationLinkId!=null ? destinationLinkId.toString() : "");
 		attr.put("CarsharingType", carsharingType);
 		attr.put("CompanyId", companyId);
