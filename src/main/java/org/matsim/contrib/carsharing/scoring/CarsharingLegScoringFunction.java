@@ -106,26 +106,24 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 				//Gets the configuration value of available cars disabling/enabling
 				boolean activateAvailCars = Boolean.parseBoolean(this.config.getModules().get("TwoWayCarsharing").getParams().get("activateAvailCars"));
 				//gets the number of available cars in the nearest station
-				int availCars = this.demandHandler.getAvailableVehiclesRentalStart().get(person.getId());
-				
-				String pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
-				
-				double cost = this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), rentalInfo.getCarsharingType(), rentalInfo, propertyManager, javaScriptCalculator);
-				
-				if(pricing.equals(PriceType.AVAIL_BASE.getPriceType()) || (pricing.equals(PriceType.TIME_BASE.getPriceType()) && activateAvailCars)) {
-					Properties properties = propertyManager.getAppExaProperties();
-					String script = properties.getProperty("jsFunc.availability.name");
-					cost = (double) javaScriptCalculator.calculate(script, cost, availCars);
+				Integer availCars = this.demandHandler.getAvailableVehiclesRentalStart().get(person.getId());
+				if(availCars!=null){
+					String pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
+
+					double cost = this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), rentalInfo.getCarsharingType(), rentalInfo, propertyManager, javaScriptCalculator);
+
+					if(pricing.equals(PriceType.AVAIL_BASE.getPriceType()) || (pricing.equals(PriceType.TIME_BASE.getPriceType()) && activateAvailCars)) {
+						Properties properties = propertyManager.getAppExaProperties();
+						String script = properties.getProperty("jsFunc.availability.name");
+						cost = (double) javaScriptCalculator.calculate(script, cost, availCars);
+					}
+					rentalInfo.setTripCost(cost);
+
+					if (marginalUtilityOfMoney != 0.0) {
+						//adds the cost per time and distance over number of available cars
+						score += -1 * (cost * marginalUtilityOfMoney); //here the cost becomes negative for the scoring part
+					}
 				}
-				rentalInfo.setTripCost(cost);
-
-
-				if (marginalUtilityOfMoney != 0.0) {
-					//adds the cost per time and distance over number of available cars
-					score += -1 * (cost * marginalUtilityOfMoney); //here the cost becomes negative for the scoring part
-
-				}
-
 			}
 		}
 	}
