@@ -21,13 +21,14 @@ import org.matsim.contrib.carsharing.events.handlers.AvailableVehiclesNumberEven
 import org.matsim.contrib.carsharing.events.handlers.EndRentalEventHandler;
 import org.matsim.contrib.carsharing.events.handlers.StartRentalEventHandler;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
-import org.matsim.contrib.carsharing.rest.RestService;
+
 import org.matsim.contrib.carsharing.simulationTime.SimulationTimeProvider;
 import org.matsim.vehicles.Vehicle;
 
 import java.math.BigInteger;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.matsim.contrib.carsharing.entity.DateUtils.doubleTime2CurrentLongTime;
 
@@ -42,7 +43,6 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 
 	@Inject Scenario scenario;
 	@Inject CarsharingSupplyInterface carsharingSupplyContainer;
-	@Inject RestService restService;
 	@Inject SimulationTimeProvider simulationTimeProvider;
 
 	private Map<Id<Person>, AgentRentals> agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();
@@ -52,8 +52,6 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 	private Map<Id<Vehicle>, Id<Person>> vehiclePersonMap = new HashMap<Id<Vehicle>, Id<Person>>();
 
 	private Map<Id<Person>, Double> enterVehicleTimes = new HashMap<Id<Person>, Double>();
-
-	private Map<Id<Person>, BigInteger> personTripIdMap = new HashMap<>();
 
 	private Map<Id<Person>, Integer> availableVehiclesRentalStart = new HashMap<>();
 
@@ -69,12 +67,7 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 
 		//Reset simulation time for next iteration and delete all bookings
 
-
 		simulationTimeProvider.resetSimulationTime();
-
-		personTripIdMap = new HashMap<>();
-
-		restService.clearTrips();
 
 		availableVehiclesRentalStart = new HashMap<>();
 	}
@@ -90,8 +83,6 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 		info.setEndLinkId(event.getLinkId());
 		Instant realEnd = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTimeProvider.getStartingSimulationTime(), event.getTime()));
 		info.setRealEnd(realEnd);
-		BigInteger tripId = personTripIdMap.remove(event.getPersonId());
-		info.setTripId(tripId);
 		agentRentals.getArr().add(info);
 
 		Id<Vehicle> vehicleId = Id.create(event.getvehicleId(), Vehicle.class);
@@ -100,8 +91,6 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 		}
 
 		this.vehicleRentalsMap.get(vehicleId).getRentals().add(info);
-
-		restService.endTrip(info);
 
 	}
 
@@ -129,10 +118,6 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 			agentRentalsMap.put(event.getPersonId(), agentRentals);
 			agentRentals.getStatsPerVehicle().put(event.getvehicleId(), info);
 		}
-
-		Trip trip = restService.rentCar(info);
-		personTripIdMap.put(event.getPersonId(), trip!=null ? trip.getId() : BigInteger.ZERO);
-
 
 	}
 
@@ -169,11 +154,6 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 					info.setAccessEndTime(event.getTime());
 
 			}
-			Instant startTime = Instant.ofEpochMilli(doubleTime2CurrentLongTime(simulationTimeProvider.getStartingSimulationTime(), event.getTime()));
-			restService.startTrip(personTripIdMap.get(personId), startTime);
-			BigInteger carId = new BigInteger(event.getVehicleId().toString());
-			//restService.openDoors(carId);
-			//restService.startEngine(carId);
 		}
 
 	}
@@ -193,8 +173,8 @@ public class DemandHandler implements PersonLeavesVehicleEventHandler,
 				info.setInVehicleTime(info.getInVehicleTime() + totalTime);
 
 			}
-			BigInteger carId = new BigInteger(event.getVehicleId().toString());
-			//restService.closeDoors(carId);
+
+
 		}
 	}
 

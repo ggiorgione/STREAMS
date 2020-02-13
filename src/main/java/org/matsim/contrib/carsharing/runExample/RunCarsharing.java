@@ -31,7 +31,6 @@ import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactoryNew;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
-import org.matsim.contrib.carsharing.rest.*;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
 import org.matsim.contrib.carsharing.simulationTime.SimulationTimeModule;
 import org.matsim.core.config.Config;
@@ -231,8 +230,6 @@ public class RunCarsharing {
 		final VehicleChoiceAgent vehicleChoiceAgent = new VehicleChoiceAgentImpl();
 		//===adding carsharing objects on supply and demand infrastructure ===
 
-		final HttpInvoker httpInvoker = new HttpInvoker();
-		final RestService restService = new ExaRestService();
 
 		controler.addOverridingModule(new AbstractModule() {
 
@@ -252,13 +249,7 @@ public class RunCarsharing {
 			    bind(VehicleChoiceAgent.class).toInstance(vehicleChoiceAgent);
 
 				bind(PropertyManager.class).to(PropertyManagerImpl.class);
-				bind(RestClientImpl.class).asEagerSingleton();
-				bind(KeycloakTokenManager.class).asEagerSingleton();
 				bind(JavaScriptCalculator.class).asEagerSingleton();
-
-				bind(HttpInvoker.class).toInstance(httpInvoker);
-				bind(RestService.class).toInstance(restService);
-
 			    bind(DemandHandler.class).asEagerSingleton();
 			}			
 			@Provides @Singleton

@@ -97,18 +97,18 @@ public class OneWayContainer implements VehiclesContainer{
 	}
 
 	@Override
-	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDstance, Consumer<CarsharingStation> fireEvent) {
+	public CSVehicle findClosestAvailableVehicle(Link startLink, String typeOfVehicle, double searchDistance, Consumer<CarsharingStation> fireEvent) {
 
 
 		//find the closest available car and reserve it (make it unavailable)
 		//if no cars within certain radius return null
 		Collection<CarsharingStation> location = 
 				owvehicleLocationQuadTree.getDisk(startLink.getCoord().getX(), 
-						startLink.getCoord().getY(), searchDstance);
+						startLink.getCoord().getY(), searchDistance);
 		if (location.isEmpty()) return null;
 
 		CarsharingStation closest = null;
-		double closestFound = searchDstance;
+		double closestFound = searchDistance;
 		for(CarsharingStation station: location) {
 			
 			Coord coord = station.getLink().getCoord();
