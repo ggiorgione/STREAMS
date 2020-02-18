@@ -32,7 +32,7 @@ public class CarsharingUtils {
     	
     	FreeFloatingConfigGroup configGroupff = new FreeFloatingConfigGroup();
     	config.addModule(configGroupff);
-    	
+
     	TwoWayCarsharingConfigGroup configGrouptw = new TwoWayCarsharingConfigGroup();
     	config.addModule(configGrouptw);
     	

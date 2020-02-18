@@ -1,16 +1,17 @@
 package org.matsim.contrib.carsharing.config;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-/** 
+
+/**
  * @author balac
  */
 
-public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
+public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup{
 	public static final String GROUP_NAME = "TwoWayCarsharing";
 	
 	private String travelingTwoWayCarsharing = null;
 	
-	private String constantTwoWayCarsharing = null;
+	private String constantCarsharing = null;
 	
 	private String vehiclelocationsInputFile = null;
 	
@@ -23,8 +24,8 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	private String distanceFeeTwoWayCarsharing = null;
 	
 	private boolean useTwoWayCarsharing = false;
-	
-	private String votTwoWayCarsharing = null;
+
+	private String betaVotCarsharing = null;
 
 	private String activateVot = "false";
 
@@ -37,7 +38,6 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	private Double priceBaseStop = null;
 
 	private boolean enableOplyPricePolicy;
-
 
 	public TwoWayCarsharingConfigGroup() {
 		super(GROUP_NAME);
@@ -53,14 +53,14 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 		this.travelingTwoWayCarsharing = travelingTwoWayCarsharing;
 	}
 
-	@StringGetter( "constantTwoWayCarsharing" )
+	@StringGetter( "constantCarsharing" )
 	public String constantTwoWayCarsharing() {
-		return this.constantTwoWayCarsharing;
+		return this.constantCarsharing;
 	}
 
-	@StringSetter( "constantTwoWayCarsharing" )
-	public void setConstantTwoWayCarsharing(final String constantTwoWayCarsharing) {
-		this.constantTwoWayCarsharing = constantTwoWayCarsharing;
+	@StringSetter( "constantCarsharing" )
+	public void setConstantCarsharing(final String constantCarsharing) {
+		this.constantCarsharing = constantCarsharing;
 	}
 	
 	@StringGetter( "rentalPriceTimeTwoWayCarsharing" )
@@ -123,14 +123,14 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 		this.useTwoWayCarsharing = useTwoWayCarsharing;
 	}
 
-	@StringGetter( "votTwoWayCarsharing" )
-	public String getVotTwoWayCarsharing() {
-		return votTwoWayCarsharing;
+	@StringGetter( "betaVotCarsharing" )
+	public String getBetaVotCarsharing() {
+		return betaVotCarsharing;
 	}
 
-	@StringSetter( "votTwoWayCarsharing" )
-	public void setVotTwoWayCarsharing(String votTwoWayCarsharing) {
-		this.votTwoWayCarsharing = votTwoWayCarsharing;
+	@StringSetter( "betaVotCarsharing" )
+	public void setBetaVotCarsharing(String betaVotCarsharing) {
+		this.betaVotCarsharing = betaVotCarsharing;
 	}
 
 	@StringGetter( "activateVot" )
@@ -141,7 +141,7 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	public void setActivateVot(String activateVot) {
 		this.activateVot = activateVot;
 	}
-	
+
 	@StringGetter( "activateAvailCars" )
 	public String getActivateAvailCars() {
 		return activateAvailCars;
@@ -190,5 +190,6 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	public void setEnableOplyPricePolicy(boolean enableOplyPricePolicy) {
 		this.enableOplyPricePolicy = enableOplyPricePolicy;
 	}
+
 }
 

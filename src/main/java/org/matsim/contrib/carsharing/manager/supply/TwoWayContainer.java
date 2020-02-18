@@ -73,10 +73,8 @@ public class TwoWayContainer implements VehiclesContainer{
 
 	@Override
 	public CSVehicle findClosestAvailableVehicle(EventsManager eventsManager, Double time, Link startLink, String typeOfVehicle, double searchDistance, Id<Person> personId, String carsharingType, Link destinationLink) {
-
 		Consumer<CarsharingStation> fireEvent = station -> eventsManager.processEvent(new NoVehicleAtStationCarSharingEvent(time, startLink, destinationLink, carsharingType, "", personId, station, typeOfVehicle));
 		Consumer<CarsharingStation> fireAvailableVehiclesNum = station -> eventsManager.processEvent(new AvailableVehiclesNumberEvent(time, startLink, destinationLink, carsharingType, "", personId, station, typeOfVehicle, ((TwoWayCarsharingStation)station).getVehicles(typeOfVehicle).size()));
-
 		return findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance, fireEvent, fireAvailableVehiclesNum);
 	}
 

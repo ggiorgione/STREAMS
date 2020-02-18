@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.config.CarSharingModes;
 import org.matsim.contrib.carsharing.js.JavaScriptCalculator;
 import org.matsim.contrib.carsharing.manager.PropertyManager;
 import org.matsim.contrib.carsharing.manager.demand.AgentRentals;
@@ -81,34 +82,28 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 			double marginalUtilityOfMoney = ((PlanCalcScoreConfigGroup)this.config.getModules().get("planCalcScore")).getMarginalUtilityOfMoney();
 			for(RentalInfo rentalInfo : agentRentals.getArr()) {
 				CSVehicle vehicle = this.carsharingSupplyContainer.getAllVehicles().get(rentalInfo.getVehId().toString());
-
+				String carSharingType = CarSharingModes.getCarShsringType(vehicle.getCsType());
 				//adds constant to score
-				score += Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("constantTwoWayCarsharing"));
-
+				score += Double.parseDouble(this.config.getModules().get(carSharingType).getParams().get("constantCarsharing"));
 				//Gets the configuration value of person VOT disabling/enabling
-				boolean activateVot = Boolean.parseBoolean(this.config.getModules().get("TwoWayCarsharing").getParams().get("activateVot"));
-
+				boolean activateVot = Boolean.parseBoolean(this.config.getModules().get(carSharingType).getParams().get("activateVot"));
 				//Calculates person Vot is it is not disabled in config.xml
 				if(activateVot) {
-
-					double personVoT = 1;
+					double personVoT = 0;
 					if( person.getAttributes().getAttribute("vot") != null) {
 						personVoT = (double) person.getAttributes().getAttribute("vot");
 					}
-
 					//Beta VOT form config.xml
-					double betaVot = Double.parseDouble(this.config.getModules().get("TwoWayCarsharing").getParams().get("votTwoWayCarsharing"));
-
+					double betaVot = Double.parseDouble(this.config.getModules().get(carSharingType).getParams().get("betaVotCarsharing"));
 					//adds personVot to score
 					score +=  betaVot * personVoT;
 				}
-
 				//Gets the configuration value of available cars disabling/enabling
-				boolean activateAvailCars = Boolean.parseBoolean(this.config.getModules().get("TwoWayCarsharing").getParams().get("activateAvailCars"));
+				boolean activateAvailCars = Boolean.parseBoolean(this.config.getModules().get(carSharingType).getParams().get("activateAvailCars"));
 				//gets the number of available cars in the nearest station
 				Integer availCars = this.demandHandler.getAvailableVehiclesRentalStart().get(person.getId());
 				if(availCars!=null){
-					String pricing = this.config.getModules().get("TwoWayCarsharing").getParams().get("pricing");
+					String pricing = this.config.getModules().get(carSharingType).getParams().get("pricing");
 
 					double cost = this.costsCalculatorContainer.getCost(vehicle.getCompanyId(), rentalInfo.getCarsharingType(), rentalInfo, propertyManager, javaScriptCalculator);
 
