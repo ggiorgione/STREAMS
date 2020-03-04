@@ -231,7 +231,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		CSVehicle vehicle = this.carsharingSupplyContainer.getVehicleWithId(vehicleId);
 		Network network = scenario.getNetwork();
 		Link link = network.getLinks().get(linkId);
-		this.carsharingSupplyContainer.getCompany(vehicle.getCompanyId()).parkVehicle(vehicle, link);
+			this.carsharingSupplyContainer.getCompany(vehicle.getCompanyId()).parkVehicle(vehicle, link);
 		return false;
 	}
 

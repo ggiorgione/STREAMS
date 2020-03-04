@@ -89,14 +89,15 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 				boolean activateVot = Boolean.parseBoolean(this.config.getModules().get(carSharingType).getParams().get("activateVot"));
 				//Calculates person Vot is it is not disabled in config.xml
 				if(activateVot) {
-					double personVoT = 0;
-					if( person.getAttributes().getAttribute("vot") != null) {
-						personVoT = (double) person.getAttributes().getAttribute("vot");
+					double personCostAttr = 0;
+					if( person.getAttributes().getAttribute("costAttr") != null) {
+						personCostAttr = (double) person.getAttributes().getAttribute("costAttr");
 					}
 					//Beta VOT form config.xml
 					double betaVot = Double.parseDouble(this.config.getModules().get(carSharingType).getParams().get("betaVotCarsharing"));
 					//adds personVot to score
-					score +=  betaVot * personVoT;
+					//personVoT = 0; //sets the VOT to 0 so it doesn't take it into account the VOT in the cost function of the carsharing
+					score +=  betaVot * personCostAttr;
 				}
 				//Gets the configuration value of available cars disabling/enabling
 				boolean activateAvailCars = Boolean.parseBoolean(this.config.getModules().get(carSharingType).getParams().get("activateAvailCars"));

@@ -76,7 +76,7 @@ public class RunCarsharing {
 
 	public static void main(String[] args) throws IOException {
 
-		Logger.getLogger( "org.matsim.core.controler.Injector" ).setLevel(Level.OFF);
+		Logger.getLogger( "org.matsim.contrib.carsharing.runExample" ).setLevel(Level.OFF);
 
 		setPatterns(args);
 
@@ -86,10 +86,10 @@ public class RunCarsharing {
 		//final Config config = ConfigUtils.loadConfig(PATH + "config.xml");
 		
 		if(Integer.parseInt(config.getModule("qsim").getValue("numberOfThreads")) > 1)
-			Logger.getLogger( "org.matsim.core.controler" ).warn("Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
+			Logger.getLogger( "org.matsim.contrib.carsharing.runExample" ).warn("Carsharing contrib is not stable for parallel qsim!! If the error occures please use 1 as the number of threads.");
 
         int numberOfThreads = Integer.parseInt(config.getModule("global").getValue("numberOfThreads"));
-        Logger.getLogger("org.matsim.core.controler" ).info("Number of Thread for replanning");
+        Logger.getLogger("org.matsim.contrib.carsharing.runExample" ).info("Number of Thread for replanning");
 
 
 		CarsharingUtils.addConfigModules(config);
@@ -145,8 +145,6 @@ public class RunCarsharing {
 
 				Node nNode = nList.item(temp);
 
-				//System.out.println("\nCurrent Element :" + nNode.getNodeName());
-
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
 					Element eElement = (Element) nNode;
@@ -156,31 +154,29 @@ public class RunCarsharing {
 
 					Id<Person> personId = Id.create(id, Person.class);
 
-					Integer income = new Integer(personIncome);
-					Double vot = new Double(personVot);
+					Integer income = new Integer(personIncome.isEmpty() ? "0" : personIncome);
+					Double vot = new Double(personVot.isEmpty() ? "1" : personVot);
 
 
 					Person person = sc.getPopulation().getPersons().get(personId);
 					if (income >= 0) {
 						person.getAttributes().putAttribute("income", income);
-						//System.out.println("--------------- id: "+person.getId()+",  income: "+person.getAttributes().getAttribute("income"));
 					} else {
-						person.getAttributes().putAttribute("income", -1);
-						System.err.println("Income is not a positive number.");
+						person.getAttributes().putAttribute("income", 0);
+						Logger.getLogger("org.matsim.contrib.carsharing.runExample" ).info("Income is not a positive number.");
 					}
 
 					if (vot >= 0) {
 						person.getAttributes().putAttribute("vot", vot);
-						//System.out.println("--------------- id: "+person.getId()+",  vot: "+person.getAttributes().getAttribute("vot"));
 					} else {
-						person.getAttributes().putAttribute("vot", -1.0);
-						System.err.println("Income is not a positive number.");
+						person.getAttributes().putAttribute("vot", 1.0);
+						Logger.getLogger("org.matsim.contrib.carsharing.runExample" ).info("VOT is not a positive number.");
 					}
 
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.getLogger("org.matsim.core.controler" ).error("Error parsing xml", e);
 		}
 	}
 

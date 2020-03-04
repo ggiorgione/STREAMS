@@ -1,5 +1,8 @@
 package org.matsim.contrib.carsharing.vehicles;
-/** 
+
+import java.util.Objects;
+
+/**
  * @author balac
  */
 public class StationBasedVehicle implements CSVehicle{
@@ -39,6 +42,6 @@ public class StationBasedVehicle implements CSVehicle{
 	@Override
 	public String getCompanyId() {
 		return companyId;
-	}	
-	
+	}
+
 }

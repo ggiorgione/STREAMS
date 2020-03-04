@@ -101,10 +101,10 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 		String[] modeCut = mode.split("_");
 		this.personArrivalMode.put(event.getPersonId(), event.getLegMode());
 		if (mode.startsWith("free") || 
-				mode.startsWith("one") || mode.startsWith("two")) {			
-			
+				mode.startsWith("one") || mode.startsWith("two")) {
+
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
-			
+
 			CSVehicle vehicle = this.carsharingSupply.getAllVehicles().get(vehId);
 			
 			Id<Link> linkId = event.getLinkId();
